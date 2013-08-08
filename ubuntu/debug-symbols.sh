@@ -23,7 +23,7 @@ deb http://ddebs.ubuntu.com $(lsb_release -cs)-security main restricted universe
 deb http://ddebs.ubuntu.com $(lsb_release -cs)-proposed main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ddebs.list
 fi
 
-if ! apt-key export 428D7C01 >/dev/null 2>&1; then
+if ! apt-key export 428D7C01 | grep 'PGP PUBLIC KEY BLOCK' >/dev/null 2>&1; then
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 428D7C01
 fi
 
