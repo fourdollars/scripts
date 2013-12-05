@@ -18,11 +18,6 @@
 
 set -e
 
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 min max"
-    exit 1
-fi
-
 min="$1"
 max="$2"
 url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
@@ -30,14 +25,32 @@ url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
 vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
 
 for ver in $vers; do
-    if dpkg --compare-versions $ver gt $min && dpkg --compare-versions $ver lt $max; then
-        pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
-        mkdir -p "$PWD/mainline/v$ver"
-        for pkg in $pkgs; do
-            [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
-        done
-        sudo dpkg -i $PWD/mainline/v$ver/*.deb
+    debver=`echo $ver | sed 's/-rc/~rc/'`
+    if [ -n "$min" -a -n "$max" ]; then
+        if dpkg --compare-versions $debver gt $min && dpkg --compare-versions $debver lt $max; then
+            downloads="$downloads $ver"
+        fi
+    else
+        downloads="$downloads $ver"
     fi
 done
+
+echo $downloads | xargs -n6 | column -t
+
+read -p 'Would you like to install these kernels: [y/N] ' answer
+
+if [ -z "$answer" -o "$answer" != 'y' ]; then
+    exit 0
+fi
+
+for ver in $downloads; do
+    pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
+    mkdir -p "$PWD/mainline/v$ver"
+    for pkg in $pkgs; do
+        [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
+    done
+    sudo dpkg -i $PWD/mainline/v$ver/*.deb
+done
+
 
 # vim:fileencodings=utf-8:expandtab:tabstop=4:shiftwidth=4:softtabstop=4
