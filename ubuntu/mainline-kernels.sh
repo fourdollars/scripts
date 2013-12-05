@@ -34,9 +34,9 @@ for ver in $vers; do
         pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
         mkdir -p "$PWD/mainline/v$ver"
         for pkg in $pkgs; do
-            wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
+            [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
         done
-        sudo dpkg -i "$PWD/mainline/v$ver/*.deb"
+        sudo dpkg -i $PWD/mainline/v$ver/*.deb
     fi
 done
 
