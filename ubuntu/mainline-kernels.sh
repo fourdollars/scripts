@@ -24,7 +24,7 @@ while :; do
         ('-h'|'--help')
             cat <<ENDLINE
 Usage $0:
-    -h|--help       This manual of this script
+    -h|--help       The manual of this script
     -f|--from NUM   Lower bound of kernel version
     -t|--to   NUM   Upper bound of kernel version
     -l|--list       List available kernel versions
