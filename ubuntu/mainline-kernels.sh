@@ -17,17 +17,49 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -e
+eval set -- $(getopt -o "hl:u:" -l "help,lower-bound:,upper-bound:" -- $@)
 
-min="$1"
-max="$2"
+while :; do
+    case "$1" in
+        ('-h'|'--help')
+            cat <<ENDLINE
+Usage $0:
+    -h|--help                This manual
+    -l|--lower-bound NUM     Lower bound
+    -u|--upper-bound NUM     Upper bound
+ENDLINE
+            exit;;
+        ('-l'|'--lower-bound')
+            min="$2"
+            shift 2;;
+        ('-u'|'--upper-bound')
+            max="$2"
+            shift 2;;
+        ('--')
+            shift
+            break;;
+    esac
+done
+
 url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
+height="$((`tput lines`-3))"
+width="$((`tput cols`-8))"
 
 vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
+num=$(echo $vers | xargs -n1 | wc -l)
 
 for ver in $vers; do
     debver=`echo $ver | sed 's/-rc/~rc/'`
     if [ -n "$min" -a -n "$max" ]; then
         if dpkg --compare-versions $debver gt $min && dpkg --compare-versions $debver lt $max; then
+            downloads="$downloads $ver"
+        fi
+    elif [ -n "$min" ]; then
+        if dpkg --compare-versions $debver gt $min; then
+            downloads="$downloads $ver"
+        fi
+    elif [ -n "$max" ]; then
+        if dpkg --compare-versions $debver lt $max; then
             downloads="$downloads $ver"
         fi
     else
