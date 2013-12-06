@@ -17,22 +17,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -e
-eval set -- $(getopt -o "hl:u:" -l "help,lower-bound:,upper-bound:" -- $@)
+eval set -- $(getopt -o "hlf:t:" -l "help,list,from:,to:" -- $@)
 
 while :; do
     case "$1" in
         ('-h'|'--help')
             cat <<ENDLINE
 Usage $0:
-    -h|--help                This manual
-    -l|--lower-bound NUM     Lower bound
-    -u|--upper-bound NUM     Upper bound
+    -h|--help       This manual of this script
+    -f|--from NUM   Lower bound of kernel version
+    -t|--to   NUM   Upper bound of kernel version
+    -l|--list       List available kernel versions
 ENDLINE
             exit;;
-        ('-l'|'--lower-bound')
+        ('-l'|'--list')
+            list="yes"
+            shift;;
+        ('-f'|'--from')
             min="$2"
             shift 2;;
-        ('-u'|'--upper-bound')
+        ('-t'|'--to')
             max="$2"
             shift 2;;
         ('--')
@@ -42,11 +46,8 @@ ENDLINE
 done
 
 url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
-height="$((`tput lines`-3))"
-width="$((`tput cols`-8))"
 
 vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
-num=$(echo $vers | xargs -n1 | wc -l)
 
 for ver in $vers; do
     debver=`echo $ver | sed 's/-rc/~rc/'`
@@ -67,12 +68,21 @@ for ver in $vers; do
     fi
 done
 
-echo $downloads | xargs -n6 | column -t
+if [ -z "$list" ]; then
+    num=$(echo $downloads | xargs -n1 | wc -l)
+    if [ -n "$min" -a -n "$max" ]; then
+        items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "on" }' | xargs echo)
+    else
+        items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
+    fi
+    downloads=$(dialog --clear --checklist 'Select kernels...' 0 0 $num $items 2>&1 >/dev/tty)
+else
+    echo $downloads | xargs -n6 | column -t
+    exit
+fi
 
-read -p 'Would you like to install these kernels: [y/N] ' answer
-
-if [ -z "$answer" -o "$answer" != 'y' ]; then
-    exit 0
+if ! dialog --title 'Would you like to install these kernels...' --yesno "$(echo $downloads | xargs -n1)" 0 0; then
+    exit
 fi
 
 for ver in $downloads; do
