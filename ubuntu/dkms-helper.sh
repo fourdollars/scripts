@@ -19,7 +19,6 @@
 ## Customized Options
 
 #DEBTYPE=quilt # experimental
-#DISTRO="$(lsb_release -c -s)"
 #MODALIASES_REGEX="(usb|pci):v"
 #MODULES_CONF=('blacklist hello' 'blacklist kitty')
 
@@ -33,22 +32,25 @@
 #REMAKE_INITRD=no
 
 CONF="${HOME}/.dkms-helper.env"
+export LANG=C LANGUAGE=C QUILT_PATCHES="debian/patches"
 
 set -e
-eval set -- $(getopt -o "c:f:hk:n:sv:V" -l "config:,firmware:,help,kernel:,name:,setup,version:,verbose" -- $@)
+eval set -- $(getopt -o "c:d:f:hk:m:n:sv:V" -l "config:,distribution:,firmware:,help,kernel:,message:,name:,setup,version:,verbose" -- "$@")
 
 help_func()
 {
     cat <<ENDLINE
 Usage of $0 [options] tarball | folder
-    -h|--help            The manual of dkms-helper
-    -c|--config     FILE The config file of dkms-helper
-    -f|--firmware   DIR  The specified firmware folder
-    -k|--kernel     KVER The specified kernel version (Ex. 3.5.0-23-generic)
-    -n|--name       NAME The specified name of DKMS package
-    -s|--setup           Set up dkms-helper eonviroment variables
-    -v|--version    NUM  The specified version of DKMS package
-    -V|--verbose         Show verbose messages
+    -h|--help                The manual of dkms-helper
+    -c|--config       FILE   The config file of dkms-helper
+    -d|--distribution DISTRO The specified distribution or it will be determined by \`lsb_release -c -s\`
+    -f|--firmware     DIR    The specified firmware folder
+    -k|--kernel       KVER   The specified kernel version (Ex. 3.5.0-23-generic)
+    -m|--message      MSG    The message in debian/changlog
+    -n|--name         NAME   The specified name of DKMS package
+    -s|--setup               Set up dkms-helper eonviroment variables
+    -v|--version      NUM    The specified version of DKMS package
+    -V|--verbose             Show verbose messages
 ENDLINE
 }
 
@@ -107,6 +109,7 @@ setup_func()
     cat "${CONF}"
 
     . "${CONF}"
+    export DEBFULLNAME DEBEMAIL
 }
 
 if [ ! -f "${CONF}" ]; then
@@ -125,6 +128,9 @@ while :; do
         ('-c'|'--config')
             . "$2"
             shift 2;;
+        ('-d'|'--distribution')
+            DISTRO="$2"
+            shift 2;;
         ('-f'|'--firmware')
             FIRWAMRE="$2"
             shift 2;;
@@ -134,8 +140,8 @@ while :; do
         ('-k'|'--kernel')
             KVER="$2"
             shift 2;;
-        ('-m'|'--maintainer')
-            DEBMAINTAINER="$2"
+        ('-m'|'--message')
+            MESSAGE="$2"
             shift 2;;
         ('-n'|'--name')
             NAME="$2"
@@ -154,8 +160,6 @@ while :; do
             break;;
     esac
 done
-
-export LANG=C LANGUAGE=C QUILT_PATCHES="debian/patches"
 
 [ -z "$1" ] && help_func && exit
 
@@ -462,6 +466,12 @@ fi
 
 sed -i "1s/stable/${DISTRO:=$(lsb_release -c -s)}/" $NAME-dkms-$VERSION/debian/changelog
 [ "${DEBTYPE:=native}" = "quilt" ] && sed -i "1s/$VERSION/$VERSION-1/" $NAME-dkms-$VERSION/debian/changelog
+
+if [ -z "$MESSAGE" ]; then
+    sed -i "3s/Automatically packaged by DKMS./Automatically packaged by DKMS helper./" $NAME-dkms-$VERSION/debian/changelog
+else
+    sed -i "3s/Automatically packaged by DKMS./$MESSAGE/" $NAME-dkms-$VERSION/debian/changelog
+fi
 
 if [ -n "$DEBEMAIL" -a -n "$DEBFULLNAME" ]; then
     sed -i "s/Dynamic Kernel Modules Support Team <pkg-dkms-maint@lists.alioth.debian.org>/$DEBFULLNAME <$DEBEMAIL>/" $NAME-dkms-$VERSION/debian/changelog
