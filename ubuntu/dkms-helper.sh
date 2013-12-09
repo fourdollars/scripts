@@ -260,6 +260,8 @@ if [ -z "$KVER" ]; then
     else
         error "There is no linux kernel header files."
     fi
+else
+    export KVER
 fi
 
 make || error 'The source does not support `make` to build kernel module. Please correct it.'
