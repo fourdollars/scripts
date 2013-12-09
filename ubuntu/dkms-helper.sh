@@ -18,18 +18,12 @@
 
 ## Customized Options
 
-#export DEBFULLNAME=
-#export DEBEMAIL=
-#export DEBMAINTAINER=
-#export KVER=3.5.0-23-generic
-#AUTOINSTALL=no
 #DEBTYPE=quilt # experimental
 #DISTRO="$(lsb_release -c -s)"
-#FIXPERMS=no
-#FORCE=no
-#MODALIASES=no
 #MODALIASES_REGEX="(usb|pci):v"
 #MODULES_CONF=('blacklist hello' 'blacklist kitty')
+
+#AUTOINSTALL=no
 #POST_ADD=
 #POST_BUILD=
 #POST_INSTALL=
@@ -38,21 +32,146 @@
 #PRE_INSTALL=
 #REMAKE_INITRD=no
 
+CONF="${HOME}/.dkms-helper.env"
+
+set -e
+eval set -- $(getopt -o "c:f:hk:n:sv:V" -l "config:,firmware:,help,kernel:,name:,setup,version:,verbose" -- $@)
+
+help_func()
+{
+    cat <<ENDLINE
+Usage of $0 [options] tarball | folder
+    -h|--help            The manual of dkms-helper
+    -c|--config     FILE The config file of dkms-helper
+    -f|--firmware   DIR  The specified firmware folder
+    -k|--kernel     KVER The specified kernel version (Ex. 3.5.0-23-generic)
+    -n|--name       NAME The specified name of DKMS package
+    -s|--setup           Set up dkms-helper eonviroment variables
+    -v|--version    NUM  The specified version of DKMS package
+    -V|--verbose         Show verbose messages
+ENDLINE
+}
+
+config_func()
+{
+    if grep "^$1=" "${CONF}" >/dev/null 2>&1; then
+        sed -i "s/^\($1=\).*/\1\"$2\"/" "${CONF}"
+    else
+        echo "$1=\"$2\"" >> "${CONF}"
+    fi
+}
+
+setup_func()
+{
+    if [ -f "${CONF}" ]; then
+        . "${CONF}"
+    fi
+
+    read -p "What is your full name? [$DEBFULLNAME] " result
+    [ -z "$result" ] && result="$DEBFULLNAME"
+    config_func "DEBFULLNAME" "$result"
+
+    read -p "What is your email address? [$DEBEMAIL] " result
+    [ -z "$result" ] && result="$DEBEMAIL"
+    config_func "DEBEMAIL" "$result"
+
+    read -p "What is your Debian package maintainer? [$DEBMAINTAINER] " result
+    [ -z "$result" ] && result="$DEBMAINTAINER"
+    config_func "DEBMAINTAINER" "$result"
+
+    read -p "Would you like to force the kernel modules of DKMS package to be installed even when the existing kernel modules have higher version? [Y/n] " result
+    if [ -z "$result" -o "$result" = "y" -o "$result" = "Y" ]; then
+        result="yes"
+    else
+        result="no"
+    fi
+    config_func "FORCE" "$result"
+
+    read -p "Would you like to keep the file permissions even after dkms changes them? [Y/n] " result
+    if [ -z "$result" -o "$result" = "y" -o "$result" = "Y" ]; then
+        result="yes"
+    else
+        result="no"
+    fi
+    config_func "FIXPERMS" "$result"
+
+    read -p "Would you like to generate modaliases information from kernel modules? [Y/n] " result
+    if [ -z "$result" -o "$result" = "y" -o "$result" = "Y" ]; then
+        result="yes"
+    else
+        result="no"
+    fi
+    config_func "MODALIASES" "$result"
+
+    echo -e "\nThe followings are your configuration for dkms-helper. You can also find them in ~/.dkms-helper.env.\n"
+    cat "${CONF}"
+
+    . "${CONF}"
+}
+
+if [ ! -f "${CONF}" ]; then
+    setup_func
+else
+    . "${CONF}"
+fi
+
+if [ -n "$2" -a -d "$2" -a -f "$2"/dkms-helper.env ]; then
+    DEBSRC="$(readlink -e $2)"
+    . "$DEBSRC"/dkms-helper.env
+fi
+
+while :; do
+    case "$1" in
+        ('-c'|'--config')
+            . "$2"
+            shift 2;;
+        ('-f'|'--firmware')
+            FIRWAMRE="$2"
+            shift 2;;
+        ('-h'|'--help')
+            help_func
+            exit;;
+        ('-k'|'--kernel')
+            KVER="$2"
+            shift 2;;
+        ('-m'|'--maintainer')
+            DEBMAINTAINER="$2"
+            shift 2;;
+        ('-n'|'--name')
+            NAME="$2"
+            shift 2;;
+        ('-s'|'--setup')
+            setup_func
+            exit;;
+        ('-v'|'--version')
+            VERSION="$2"
+            shift 2;;
+        ('-V'|'--verbose')
+            set -x
+            shift;;
+        ('--')
+            shift
+            break;;
+    esac
+done
+
 export LANG=C LANGUAGE=C QUILT_PATCHES="debian/patches"
 
-set -e # -x # unmark this for debug messages.
+[ -z "$1" ] && help_func && exit
 
-[ -z "$1" ] && echo "Usage $0 { tarball | folder } [Debian source package folder]" && exit 0
-
-# Detect name and version
+# Detect tarball or folder
 if [ -d "$1" ]; then
     FOLDER="$(basename $1)"
-    NAME="${FOLDER%-*}"
-    VERSION="${FOLDER##*-}"
 else
     TARBALL="$(basename $1)"
     FOLDER="${TARBALL%.tar*}"
+fi
+
+if [ -z "$NAME" ]; then
     NAME="${FOLDER%-*}"
+fi
+
+if [ -z "$VERSION" ]; then
     VERSION="${FOLDER##*-}"
 fi
 
@@ -82,22 +201,14 @@ if [ -f "$1" ]; then
     DIR="$(dirname $FOLDER)"
     mv -v "$FOLDER" "$DIR/$NAME"
 else
-    cp -r "$NAME-$VERSION" "$BUILDROOT/$NAME-$VERSION/$NAME"
+    cp -r "$FOLDER" "$BUILDROOT/$NAME-$VERSION/$NAME"
 fi
 
 cd "$BUILDROOT"
 tar cJf "${NAME}_${VERSION}.orig.tar.xz" "$NAME-$VERSION"
 cd -
 
-# Check dkms-helper.env if any
-if [ -e "${HOME}/.dkms-helper.env" ]; then
-    . "${HOME}/.dkms-helper.env"
-fi
-if [ -n "$2" -a -d "$2" -a -f "$2"/dkms-helper.env ]; then
-    DEB="$(readlink -e $2)"
-    . "$DEB"/dkms-helper.env
-fi
-
+# Prepare DKMS environment variables
 DKMS_SETUP="--no-prepare-kernel --no-clean-kernel --dkmstree $BUILDROOT/dkms --sourcetree $BUILDROOT/source --installtree $BUILDROOT/install"
 DKMS_MOD="-m $NAME -v $VERSION"
 DKMS_ARG="$DKMS_SETUP $DKMS_MOD"
@@ -110,8 +221,8 @@ for ((i=0; i<${#OPTION[@]}; i++)); do
     HOOK="${OPTION[$i]}"
     eval FILE="\$${OPTION[$i]}"
     if [ -n "${FILE}" ]; then
-        if [ -n "${DEB}" ]; then
-            eval $HOOK="$(readlink -e ${DEB}/${NAME}/$(basename ${FILE}))"
+        if [ -n "${DEBSRC}" ]; then
+            eval $HOOK="$(readlink -e ${DEBSRC}/${NAME}/$(basename ${FILE}))"
         else
             eval $HOOK="$(readlink -e ${FILE})"
         fi
@@ -356,8 +467,8 @@ if [ -n "$DEBEMAIL" -a -n "$DEBFULLNAME" ]; then
     sed -i "s/Dynamic Kernel Modules Support Team <pkg-dkms-maint@lists.alioth.debian.org>/$DEBFULLNAME <$DEBEMAIL>/" $NAME-dkms-$VERSION/debian/changelog
 fi
 
-if [ -f "$DEB"/debian/changelog ]; then
-    cat "$DEB"/debian/changelog >> $NAME-dkms-$VERSION/debian/changelog
+if [ -f "$DEBSRC"/debian/changelog ]; then
+    cat "$DEBSRC"/debian/changelog >> $NAME-dkms-$VERSION/debian/changelog
 fi
 
 if [ -n "$DEBMAINTAINER" ]; then
@@ -429,3 +540,5 @@ cd -
 
 cp -v $BUILDROOT/dkms/$NAME/$VERSION/dsc/$NAME-dkms_$VERSION* .
 rm -fr "$BUILDROOT"
+
+# vim:fileencodings=utf-8:expandtab:tabstop=4:shiftwidth=4:softtabstop=4
