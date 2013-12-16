@@ -85,7 +85,7 @@ if ! dialog --title 'Would you like to install these kernels...' --yesno "$(echo
     exit
 fi
 
-for ver in $downloads; do
+for ver in $(eval echo $downloads); do
     pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
     mkdir -p "$PWD/mainline/v$ver"
     for pkg in $pkgs; do
