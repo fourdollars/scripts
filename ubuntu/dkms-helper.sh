@@ -237,7 +237,7 @@ cd "$BUILDROOT/$NAME-$VERSION/$NAME"
 
 # Adjust Makefile
 if ! grep '^KVER?= $(shell uname -r)' Makefile; then
-    cp -v Makefile Makefile.orig
+    cp -v Makefile Makefile.dkms-helper
     sed -i 's/\($(shell uname -r)\|`uname -r`\)/$(KVER)/' Makefile
     sed -i '0,/\(^$\|^[^#]*$\)/ s/\(^$\|^[^#*]\)/KVER?= $(shell uname -r)\n&/' Makefile
 fi
@@ -317,9 +317,9 @@ make clean || error 'The source does not support `make clean`. Please correct it
 # AceLan's request doesn't work yet.
 if false; then
 if [ ! -e Kbuild ]; then
-    mv -v Makefile.orig Kbuild
+    mv -v Makefile.dkms-helper Kbuild
 else
-    rm Makefile.orig
+    rm Makefile.dkms-helper
 fi
 
 cat > Makefile <<ENDLINE
