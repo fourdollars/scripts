@@ -112,17 +112,6 @@ setup_func()
     export DEBFULLNAME DEBEMAIL
 }
 
-if [ ! -f "${CONF}" ]; then
-    setup_func
-else
-    . "${CONF}"
-fi
-
-if [ -n "$2" -a -d "$2" -a -f "$2"/dkms-helper.env ]; then
-    DEBSRC="$(readlink -e $2)"
-    . "$DEBSRC"/dkms-helper.env
-fi
-
 while :; do
     case "$1" in
         ('-c'|'--config')
@@ -160,6 +149,22 @@ while :; do
             break;;
     esac
 done
+
+if [ -z "$*" ]; then
+    help_func
+    exit
+fi
+
+if [ ! -f "${CONF}" ]; then
+    setup_func
+else
+    . "${CONF}"
+fi
+
+if [ -n "$2" -a -d "$2" -a -f "$2"/dkms-helper.env ]; then
+    DEBSRC="$(readlink -e $2)"
+    . "$DEBSRC"/dkms-helper.env
+fi
 
 [ -z "$1" ] && help_func && exit
 
