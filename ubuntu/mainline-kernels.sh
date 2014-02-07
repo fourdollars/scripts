@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
+
 set -e
 eval set -- $(getopt -o "hlf:t:" -l "help,list,from:,to:" -- $@)
 
@@ -45,30 +47,44 @@ ENDLINE
     esac
 done
 
-url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
+download_and_install_kernels ()
+{
+    for ver in $(eval echo $downloads); do
+        pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
+        mkdir -p "$PWD/mainline/v$ver"
+        for pkg in $pkgs; do
+            [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
+        done
+        sudo dpkg -i $PWD/mainline/v$ver/*.deb
+    done
+}
 
-vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
+check_available_kernels ()
+{
+    vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
 
-for ver in $vers; do
-    debver=`echo $ver | sed 's/-rc/~rc/'`
-    if [ -n "$min" -a -n "$max" ]; then
-        if dpkg --compare-versions $debver gt $min && dpkg --compare-versions $debver lt $max; then
+    for ver in $vers; do
+        debver=`echo $ver | sed 's/-rc/~rc/'`
+        if [ -n "$min" -a -n "$max" ]; then
+            if dpkg --compare-versions $debver gt $min && dpkg --compare-versions $debver lt $max; then
+                downloads="$downloads $ver"
+            fi
+        elif [ -n "$min" ]; then
+            if dpkg --compare-versions $debver gt $min; then
+                downloads="$downloads $ver"
+            fi
+        elif [ -n "$max" ]; then
+            if dpkg --compare-versions $debver lt $max; then
+                downloads="$downloads $ver"
+            fi
+        else
             downloads="$downloads $ver"
         fi
-    elif [ -n "$min" ]; then
-        if dpkg --compare-versions $debver gt $min; then
-            downloads="$downloads $ver"
-        fi
-    elif [ -n "$max" ]; then
-        if dpkg --compare-versions $debver lt $max; then
-            downloads="$downloads $ver"
-        fi
-    else
-        downloads="$downloads $ver"
-    fi
-done
+    done
+}
 
-if [ -z "$list" ]; then
+select_kernels_to_install ()
+{
     num=$(echo $downloads | xargs -n1 | wc -l)
     if [ -n "$min" -a -n "$max" ]; then
         items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "on" }' | xargs echo)
@@ -76,23 +92,26 @@ if [ -z "$list" ]; then
         items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
     fi
     downloads=$(dialog --clear --checklist 'Select kernels...' 0 0 $num $items 2>&1 >/dev/tty)
-else
-    echo $downloads | xargs -n6 | column -t
-    exit
+}
+
+if [ -n "$*" ]; then
+    downloads="$*"
+fi
+
+if [ -z "$downloads" ]; then
+    check_available_kernels
+    if [ -z "$list" ]; then
+        select_kernels_to_install
+    else
+        echo $downloads | xargs -n6 | column -t
+        exit
+    fi
 fi
 
 if ! dialog --title 'Would you like to install these kernels...' --yesno "$(echo $downloads | xargs -n1)" 0 0; then
     exit
 fi
 
-for ver in $(eval echo $downloads); do
-    pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
-    mkdir -p "$PWD/mainline/v$ver"
-    for pkg in $pkgs; do
-        [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
-    done
-    sudo dpkg -i $PWD/mainline/v$ver/*.deb
-done
-
+download_and_install_kernels
 
 # vim:fileencodings=utf-8:expandtab:tabstop=4:shiftwidth=4:softtabstop=4
