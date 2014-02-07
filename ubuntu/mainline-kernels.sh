@@ -49,8 +49,13 @@ done
 
 download_and_install_kernels ()
 {
+    if [ "$(uname -m)" = 'x86_64' ]; then
+        arch='amd64'
+    else
+        arch='i386'
+    fi
     for ver in $(eval echo $downloads); do
-        pkgs=`wget -q $url/v$ver/ -O - | grep -o 'linux[^"]*\(all\|amd64\).deb' | sort -u`
+        pkgs=`wget -q $url/v$ver/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v lowlatency | sort -u`
         mkdir -p "$PWD/mainline/v$ver"
         for pkg in $pkgs; do
             [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v$ver/$pkg" -O "$PWD/mainline/v$ver/$pkg"
