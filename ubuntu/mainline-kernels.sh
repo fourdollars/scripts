@@ -19,7 +19,7 @@
 url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
 
 set -e
-eval set -- $(getopt -o "hlf:t:" -l "help,list,from:,to:" -- $@)
+eval set -- $(getopt -o "hlrf:t:" -l "help,list,remove,from:,to:" -- $@)
 
 while :; do
     case "$1" in
@@ -30,10 +30,14 @@ Usage $0:
     -f|--from NUM   Lower bound of kernel version
     -t|--to   NUM   Upper bound of kernel version
     -l|--list       List available kernel versions
+    -r|--remove     Remove mainline kernels
 ENDLINE
             exit;;
         ('-l'|'--list')
             list="yes"
+            shift;;
+        ('-r'|'--remove')
+            remove="yes"
             shift;;
         ('-f'|'--from')
             min="$2"
@@ -96,8 +100,39 @@ select_kernels_to_install ()
     else
         items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
     fi
-    downloads=$(dialog --clear --checklist 'Select kernels...' 0 0 $num $items 2>&1 >/dev/tty)
+    downloads=$(dialog --clear --checklist 'Select kernels to install...' 0 0 $num $items 2>&1 >/dev/tty)
 }
+
+remove_installed_mainline_kernels ()
+{
+    installed=""
+    for i in $(dpkg-query -W | grep linux-image-[2-9] | cut -d '-' -f 3-4); do
+        if [ $(echo $i | cut -d '-' -f 2 | wc -c) -gt 6 ]; then
+            installed="$installed $i"
+        fi
+    done
+    if [ -z "$installed" ]; then
+        echo "There is no mainline kernel to remove."
+        exit
+    fi
+
+    num=$(echo $installed | xargs -n1 | wc -l)
+    installed=$(echo $installed | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
+
+    packages=""
+    for i in $(dialog --clear --checklist 'Select kernels to remove...' 0 0 $num $installed 2>&1 >/dev/tty); do
+        packages="$packages $(dpkg-query -W | eval grep linux.*$i | awk '{print $1}')"
+    done
+
+    if [ -n "$packages" ]; then
+        sudo apt-get purge $packages --yes
+    fi
+}
+
+if [ -n "$remove" ]; then
+    remove_installed_mainline_kernels
+    exit
+fi
 
 if [ -n "$*" ]; then
     downloads="$*"
