@@ -35,7 +35,7 @@ CONF="${HOME}/.dkms-helper.env"
 export LANG=C LANGUAGE=C QUILT_PATCHES="debian/patches"
 
 set -e
-eval set -- $(getopt -o "c:d:f:hk:m:n:sv:V" -l "config:,distribution:,firmware:,help,kernel:,message:,modalias:,name:,setup,version:,verbose" -- "$@")
+eval set -- $(getopt -o "c:d:f:hk:m:n:sv:V" -l "config:,distribution:,firmware:,help,kernel:,message:,modalias:,name:,setup,vcs-bzr:,version:,verbose" -- "$@")
 
 help_func()
 {
@@ -50,6 +50,7 @@ Usage of $0 [options] tarball | folder
     --modalias        MODALIAS The modalias string
     -n|--name         NAME     The specified name of DKMS package
     -s|--setup                 Set up dkms-helper eonviroment variables
+    --vcs-bzr         Vcs-Bzr  The information in debian/control
     -v|--version      NUM      The specified version of DKMS package
     -V|--verbose               Show verbose messages
 ENDLINE
@@ -142,6 +143,9 @@ while :; do
         ('-s'|'--setup')
             setup_func
             exit;;
+        ('--vcs-bzr')
+            VCS_BZR="$2"
+            shift 2;;
         ('-v'|'--version')
             VERSION="$2"
             shift 2;;
@@ -558,6 +562,10 @@ fi
 
 if [ -f "$DEBSRC"/debian/changelog ]; then
     cat "$DEBSRC"/debian/changelog >> $NAME-dkms-$VERSION/debian/changelog
+fi
+
+if [ -n "$VCS_BZR" ]; then
+    sed -i "s/^Maintainer:\(.*\)/Maintainer:\1\nVcs-Bzr: $VCS_BZR/" $NAME-dkms-$VERSION/debian/control
 fi
 
 if [ -n "$DEBMAINTAINER" ]; then
