@@ -35,22 +35,23 @@ CONF="${HOME}/.dkms-helper.env"
 export LANG=C LANGUAGE=C QUILT_PATCHES="debian/patches"
 
 set -e
-eval set -- $(getopt -o "c:d:f:hk:m:n:sv:V" -l "config:,distribution:,firmware:,help,kernel:,message:,name:,setup,version:,verbose" -- "$@")
+eval set -- $(getopt -o "c:d:f:hk:m:n:sv:V" -l "config:,distribution:,firmware:,help,kernel:,message:,modalias:,name:,setup,version:,verbose" -- "$@")
 
 help_func()
 {
     cat <<ENDLINE
 Usage of $0 [options] tarball | folder
-    -h|--help                The manual of dkms-helper
-    -c|--config       FILE   The config file of dkms-helper
-    -d|--distribution DISTRO The specified distribution or it will be determined by \`lsb_release -c -s\`
-    -f|--firmware     DIR    The specified firmware folder
-    -k|--kernel       KVER   The specified kernel version (Ex. 3.5.0-23-generic)
-    -m|--message      MSG    The message in debian/changlog
-    -n|--name         NAME   The specified name of DKMS package
-    -s|--setup               Set up dkms-helper eonviroment variables
-    -v|--version      NUM    The specified version of DKMS package
-    -V|--verbose             Show verbose messages
+    -h|--help                  The manual of dkms-helper
+    -c|--config       FILE     The config file of dkms-helper
+    -d|--distribution DISTRO   The specified distribution or it will be determined by \`lsb_release -c -s\`
+    -f|--firmware     DIR      The specified firmware folder
+    -k|--kernel       KVER     The specified kernel version (Ex. 3.5.0-23-generic)
+    -m|--message      MSG      The message in debian/changlog
+    --modalias        MODALIAS The modalias string
+    -n|--name         NAME     The specified name of DKMS package
+    -s|--setup                 Set up dkms-helper eonviroment variables
+    -v|--version      NUM      The specified version of DKMS package
+    -V|--verbose               Show verbose messages
 ENDLINE
 }
 
@@ -131,6 +132,9 @@ while :; do
             shift 2;;
         ('-m'|'--message')
             MESSAGE="$2"
+            shift 2;;
+        ('--modalias')
+            MODALIAS="$MODALIAS $2"
             shift 2;;
         ('-n'|'--name')
             NAME="$2"
@@ -315,6 +319,14 @@ if [ "${MODALIASES:=yes}" = 'yes' ]; then
     fi
 else
     [ -f .modaliases ] && rm .modaliases
+fi
+
+if [ -n "$MODALIAS" ]; then
+    MODALIASES='yes'
+    for modalias in "$MODALIAS"; do
+        echo "alias $modalias hwe $NAME-dkms" >> .modaliases
+    done
+    cat .modaliases
 fi
 
 make clean || error 'The source does not support `make clean`. Please correct it.'
