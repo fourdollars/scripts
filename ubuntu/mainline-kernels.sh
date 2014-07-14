@@ -75,15 +75,15 @@ check_available_kernels ()
     for ver in $vers; do
         debver=`echo $ver | sed 's/-rc/~rc/'`
         if [ -n "$min" -a -n "$max" ]; then
-            if dpkg --compare-versions $debver gt $min && dpkg --compare-versions $debver lt $max; then
+            if dpkg --compare-versions $debver ge $min && dpkg --compare-versions $debver le $max; then
                 downloads="$downloads $ver"
             fi
         elif [ -n "$min" ]; then
-            if dpkg --compare-versions $debver gt $min; then
+            if dpkg --compare-versions $debver ge $min; then
                 downloads="$downloads $ver"
             fi
         elif [ -n "$max" ]; then
-            if dpkg --compare-versions $debver lt $max; then
+            if dpkg --compare-versions $debver le $max; then
                 downloads="$downloads $ver"
             fi
         else
@@ -143,7 +143,7 @@ if [ -z "$downloads" ]; then
     if [ -z "$list" ]; then
         select_kernels_to_install
     else
-        echo $downloads | xargs -n6 | column -t
+        echo $downloads | xargs -n6 | column -t | sed 's/-rc/~rc/g'
         exit
     fi
 fi
