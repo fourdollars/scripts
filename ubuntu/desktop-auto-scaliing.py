@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from gi.repository import Gtk, Gio, GLib
+import math
+
 def check_hidpi_display():
-    from gi.repository import Gtk
-    import math
     win = Gtk.OffscreenWindow()
     screen = win.get_screen()
     major = screen.get_primary_monitor()
@@ -30,15 +31,19 @@ def check_hidpi_display():
     else:
         return (False, screen.get_monitor_plug_name(major))
 
-def main():
-    (result, connector) = check_hidpi_display()
+def list_settings(msg=None):
+    if msg:
+        print(msg)
+    for schema in Gio.Settings.list_schemas():
+        if schema == 'com.canonical.Unity.Interface' or schema == 'com.ubuntu.user-interface':
+            settings = Gio.Settings.new(schema)
+            print('[', schema, ']')
+            for key in settings.list_keys():
+                print(key, '=', settings.get_value(key))
 
-    if not result:
-        return
-
-    from gi.repository import Gio, GLib
-    settings = Gio.Settings.new("com.ubuntu.user-interface")
-    outputs = settings.get_value("scale-factor").unpack()
+def apply_settings(connector):
+    settings = Gio.Settings.new('com.ubuntu.user-interface')
+    outputs = settings.get_value('scale-factor').unpack()
 
     outputs[connector] = 16
     if connector == 'eDP1':
@@ -46,7 +51,17 @@ def main():
     elif connector == 'eDP-1-0':
         outputs['eDP1'] = 16
 
-    settings.set_value("scale-factor", GLib.Variant('a{si}', outputs))
+    settings.set_value('scale-factor', GLib.Variant('a{si}', outputs))
+
+def main():
+    (result, connector) = check_hidpi_display()
+
+    if not result:
+        return
+
+    list_settings('Before:')
+    apply_settings(connector)
+    list_settings('After:')
 
 if __name__ == '__main__':
     main()
