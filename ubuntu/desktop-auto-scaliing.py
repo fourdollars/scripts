@@ -16,12 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gio, GLib
+from gi.repository import Gdk, Gio, GLib
 import math
 
 def check_hidpi_display():
-    win = Gtk.OffscreenWindow()
-    screen = win.get_screen()
+    screen = Gdk.Screen.get_default()
     major = screen.get_primary_monitor()
     diagonal = math.sqrt(screen.get_width() ** 2 + screen.get_height() ** 2)
     diagonal_mm = math.sqrt(screen.get_monitor_width_mm(major) ** 2 + screen.get_monitor_height_mm(major) ** 2)
