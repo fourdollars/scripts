@@ -24,8 +24,8 @@ def check_hidpi_display():
     major = screen.get_primary_monitor()
     diagonal = math.sqrt(screen.get_width() ** 2 + screen.get_height() ** 2)
     diagonal_mm = math.sqrt(screen.get_monitor_width_mm(major) ** 2 + screen.get_monitor_height_mm(major) ** 2)
-    dpi = math.floor(diagonal * 25.4 / diagonal_mm)
-    if dpi / screen.get_resolution() >= 2:
+    ppi = math.floor(diagonal * 25.4 / diagonal_mm)
+    if ppi > 200:
         return (True, screen.get_monitor_plug_name(major))
     else:
         return (False, screen.get_monitor_plug_name(major))
