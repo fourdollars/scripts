@@ -32,7 +32,7 @@ if [ -z "$old" -o -z "$new" ]; then
     exit
 fi
 
-set -x -e
+set -e
 
 tmp="$(mktemp -u)"
 while [ -e "$tmp" ]; do
@@ -60,6 +60,7 @@ lzma -dc -S .lz "$old" | cpio -id
 cd ..
 
 cp old/conf/uuid.conf new/conf/uuid.conf
+cat new/conf/uuid.conf
 
 cd new
 find . | cpio --quiet --dereference -o -H newc | lzma -7 > "$TARGET"
