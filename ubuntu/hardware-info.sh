@@ -68,7 +68,7 @@ if [ -n "$DISPLAY" ] && which xinput; then
     xinput list --long > $platform.xinput
     touchpad="$(xinput | grep -i touchpad | sed 's/.*id=\([0-9]*\).*/\1/')"
     [ -n "$touchpad" ] && xinput list-props $touchpad > $platform.xinput.touchpad
-    touchscreen="$(xinput | grep -i touchscreen | sed 's/.*id=\([0-9]*\).*/\1/')"
+    touchscreen="$(xinput | grep -i -e touchscreen -e 'touch screen' | sed 's/.*id=\([0-9]*\).*/\1/')"
     [ -n "$touchscreen" ] && xinput list-props $touchscreen > $platform.xinput.touchscreen
 fi
 
