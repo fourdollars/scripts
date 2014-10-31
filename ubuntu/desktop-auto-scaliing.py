@@ -22,10 +22,12 @@ import math
 def check_hidpi_display():
     screen = Gdk.Screen.get_default()
     major = screen.get_primary_monitor()
-    diagonal = math.sqrt(screen.get_width() ** 2 + screen.get_height() ** 2)
+    width = screen.get_width()
+    height = screen.get_height()
+    diagonal = math.sqrt(width ** 2 + height ** 2)
     diagonal_mm = math.sqrt(screen.get_monitor_width_mm(major) ** 2 + screen.get_monitor_height_mm(major) ** 2)
     ppi = math.floor(diagonal * 25.4 / diagonal_mm)
-    if ppi > 200:
+    if ppi >= 192 and height >= 1200:
         return (True, screen.get_monitor_plug_name(major))
     else:
         return (False, screen.get_monitor_plug_name(major))
