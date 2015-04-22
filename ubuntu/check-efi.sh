@@ -12,9 +12,10 @@ if [ ! -d /sys/firmware/efi ]; then
     zenity --info --title "No EFI System" --text "There is no /sys/firmware/efi"
 else
     zenity --question --title "Would you like to stop?" --text "You have 5 seconds to decide." --timeout=5
-    if [ \$? != 0 ]; then
+    RET=\$?
+    if [ \$RET != 0 ]; then
         dbus-send --system --print-reply --dest=org.freedesktop.login1 /org/freedesktop/login1 "org.freedesktop.login1.Manager.Reboot" boolean:true
-    elif [ \$? = 0 ]; then
+    elif [ \$RET = 0 ]; then
         rm ~/.config/autostart/check-efi.desktop
         rm ~/bin/check_efi
     fi
