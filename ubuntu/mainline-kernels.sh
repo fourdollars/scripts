@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 # -*- coding: utf-8; indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 #
-# Copyright (C) 2013 Shih-Yuan Lee (FourDollars) <fourdollars@gmail.com>
+# Copyright (C) 2015 Shih-Yuan Lee (FourDollars) <fourdollars@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
