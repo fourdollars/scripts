@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if ! grep ddebs.ubuntu.com /etc/apt/sources.list.d/ddebs.list >/dev/null 2>&1; then
-    cat >> /etc/apt/sources.list.d/ddebs.list <<ENDLINE
+    cat <<ENDLINE | sudo tee -a /etc/apt/sources.list.d/ddebs.list
 deb http://ddebs.ubuntu.com $(lsb_release -cs) main restricted universe multiverse
 deb http://ddebs.ubuntu.com $(lsb_release -cs)-updates main restricted universe multiverse
 deb http://ddebs.ubuntu.com $(lsb_release -cs)-security main restricted universe multiverse
