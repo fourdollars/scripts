@@ -56,7 +56,7 @@ else
 fi
 
 NOTSIGNED=0
-for MODULE in /lib/modules/$(uname -r)/updates/dkms/*.ko; do
+for MODULE in $(ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko 2>/dev/null); do
   if hexdump -e '"%_p"' $MODULE | tail | grep signature > /dev/null 2>&1; then
     true
   else
@@ -70,7 +70,7 @@ if [ "$NOTSIGNED" -eq 0 ]; then
 fi
 
 openssl aes-256-cbc -d -salt -in "$HOME/.config/dkms-self-signing/MOK.priv.aes" -out "$HOME/.config/dkms-self-signing/MOK.priv" -k "$PASSWORD"
-for MODULE in /lib/modules/$(uname -r)/updates/dkms/*.ko; do
+for MODULE in $(ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko 2>/dev/null); do
   if ! hexdump -e '"%_p"' $MODULE | tail | grep signature > /dev/null 2>&1; then
     /usr/src/linux-headers-$(uname -r)/scripts/sign-file sha256 "$HOME/.config/dkms-self-signing/MOK.priv" "$HOME/.config/dkms-self-signing/MOK.der" $MODULE
     echo "$MODULE is signed."
