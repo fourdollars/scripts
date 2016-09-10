@@ -20,7 +20,9 @@
 
 #DEBTYPE=quilt # experimental
 #MODALIASES_REGEX="(usb|pci):v"
+#KO_REGEX="intel"
 #MODULES_CONF=('blacklist hello' 'blacklist kitty')
+#BUILD_EXCLUSIVE_KERNEL="^4.4.*"
 
 #AUTOINSTALL=no
 #POST_ADD=
@@ -231,7 +233,7 @@ DKMS_MOD="-m $NAME -v $VERSION"
 DKMS_ARG="$DKMS_SETUP $DKMS_MOD"
 
 OPTION=(POST_ADD POST_BUILD POST_INSTALL POST_REMOVE PRE_BUILD PRE_INSTALL)
-EXPORT=(DISTRO FORCE MODALIASES MODALIASES_REGEX FIXPERMS REMAKE_INITRD AUTOINSTALL)
+EXPORT=(DISTRO FORCE MODALIASES MODALIASES_REGEX KO_REGEX FIXPERMS REMAKE_INITRD AUTOINSTALL BUILD_EXCLUSIVE_KERNEL)
 
 # Collect all pathes of optional scripts.
 for ((i=0; i<${#OPTION[@]}; i++)); do
@@ -291,9 +293,11 @@ for module in `find -name '*.ko' | sort`; do
     if [ -z "$path" ]; then
         path="."
     fi
-    MODULE[$i]="$name"
-    FOLDER[$i]="$path"
-    i="$(expr 1 + $i)"
+    if echo "$name" | egrep "$KO_REGEX"; then
+        MODULE[$i]="$name"
+        FOLDER[$i]="$path"
+        i="$(expr 1 + $i)"
+    fi
 done
 
 if [ -z "$i" ]; then
@@ -378,7 +382,6 @@ fi
 cat > dkms.conf <<ENDLINE
 PACKAGE_NAME="$NAME"
 PACKAGE_VERSION="$VERSION"
-AUTOINSTALL="yes"
 MAKE="'make' -C ./ KVER=\$kernelver"
 CLEAN="'make' -C ./ clean"
 ENDLINE
@@ -386,8 +389,13 @@ ENDLINE
 if [ "${AUTOINSTALL:=yes}" = "yes" ]; then
     echo "AUTOINSTALL=\"${AUTOINSTALL}\"" >> dkms.conf
 fi
+
 if [ "${REMAKE_INITRD:=yes}" = "yes" ]; then
     echo "REMAKE_INITRD=\"${REMAKE_INITRD}\"" >> dkms.conf
+fi
+
+if [ -n "$BUILD_EXCLUSIVE_KERNEL" ]; then
+    echo "BUILD_EXCLUSIVE_KERNEL=\"${BUILD_EXCLUSIVE_KERNEL}\"" >> dkms.conf
 fi
 
 # Insert optional scripts into dkms.conf
