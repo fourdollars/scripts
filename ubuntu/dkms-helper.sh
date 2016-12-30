@@ -432,9 +432,11 @@ cp -a "$BUILDROOT/$NAME-$VERSION/$NAME" "$BUILDROOT/source/$NAME-$VERSION"
 dkms add $DKMS_ARG
 dkms mkdsc $DKMS_ARG --source-only --legacy-postinst=0
 
-# Insert modaliases into Debian source package
 cd $BUILDROOT/dkms/$NAME/$VERSION/dsc
 dpkg-source -x $NAME-dkms_$VERSION.dsc
+sed -i 's/in DKMS format.$/in DKMS format wrapped by dkms-helper./' $NAME-dkms-$VERSION/debian/control
+
+# Insert modaliases into Debian source package
 if [ "${MODALIASES:=yes}" = 'yes' ]; then
     if [ -n "$(cat $NAME-dkms-$VERSION/$NAME-$VERSION/.modaliases)" ]; then
         mv $NAME-dkms-$VERSION/$NAME-$VERSION/.modaliases $NAME-dkms-$VERSION/debian/modaliases
@@ -500,7 +502,7 @@ if [ -n "$FIRMWARE" -a -d "$FIRMWARE" ]; then
 
 Package: $NAME-firmware
 Architecture: all
-Description: $NAME's firmware.
+Description: $NAME's firmware wrapped by dkms-helper.
 ENDLINE
     cat >>$NAME-dkms-$VERSION/debian/$NAME-firmware.install <<ENDLINE
 firmware /usr/share/$NAME-$VERSION
