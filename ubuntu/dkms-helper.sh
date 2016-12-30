@@ -396,6 +396,8 @@ fi
 
 if [ -n "$BUILD_EXCLUSIVE_KERNEL" ]; then
     echo "BUILD_EXCLUSIVE_KERNEL=\"${BUILD_EXCLUSIVE_KERNEL}\"" >> dkms.conf
+else
+    echo "BUILD_EXCLUSIVE_KERNEL=\"^$(echo $KVER | cut -d '.' -f -2).*\"" >> dkms.conf
 fi
 
 # Insert optional scripts into dkms.conf
