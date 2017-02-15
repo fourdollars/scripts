@@ -9,9 +9,8 @@ fi
 # Check if Secure Boot is enabled
 mokutil --sb-state | grep enabled > /dev/null 2>&1 || exit
 
-# Check if there is any dkms package
-which dkms > /dev/null 2>&1 || exit
-[ "$(dkms status | wc -l)" -gt 0 ] || exit
+# Check if there is any additional kernel module
+ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko >/dev/null 2>&1 && exit
 
 NAME="$(dmidecode -s system-product-name)"
 
