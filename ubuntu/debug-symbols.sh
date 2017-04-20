@@ -20,13 +20,12 @@ if ! grep ddebs.ubuntu.com /etc/apt/sources.list.d/ddebs.list >/dev/null 2>&1; t
     cat <<ENDLINE | sudo tee -a /etc/apt/sources.list.d/ddebs.list
 deb http://ddebs.ubuntu.com $(lsb_release -cs) main restricted universe multiverse
 deb http://ddebs.ubuntu.com $(lsb_release -cs)-updates main restricted universe multiverse
-deb http://ddebs.ubuntu.com $(lsb_release -cs)-security main restricted universe multiverse
 deb http://ddebs.ubuntu.com $(lsb_release -cs)-proposed main restricted universe multiverse
 ENDLINE
 fi
 
 if ! apt-key export 428D7C01 | grep 'PGP PUBLIC KEY BLOCK' >/dev/null 2>&1; then
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 428D7C01
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C8CAB6595FDFF622
 fi
 
 sudo apt-get update
