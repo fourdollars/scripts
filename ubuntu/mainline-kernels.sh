@@ -17,9 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
+script="$0"
 
 set -e
-eval set -- $(getopt -o "hlrf:t:" -l "help,list,remove,from:,to:" -- $@)
+eval set -- $(getopt -o "hlruf:t:" -l "help,list,remove,update,from:,to:" -- $@)
 
 while :; do
     case "$1" in
@@ -31,6 +32,7 @@ Usage $0:
     -t|--to   NUM   Upper bound of kernel version
     -l|--list       List available kernel versions
     -r|--remove     Remove mainline kernels
+    -u|--update     Update the script itself
 ENDLINE
             exit;;
         ('-l'|'--list')
@@ -38,6 +40,9 @@ ENDLINE
             shift;;
         ('-r'|'--remove')
             remove="yes"
+            shift;;
+        ('-u'|'--update')
+            update="yes"
             shift;;
         ('-f'|'--from')
             min="$2"
@@ -128,6 +133,11 @@ remove_installed_mainline_kernels ()
         sudo apt-get purge $packages --yes
     fi
 }
+
+if [ -n "$update" ]; then
+    wget https://raw.githubusercontent.com/fourdollars/scripts/master/ubuntu/mainline-kernels.sh -O $script
+    exit
+fi
 
 if [ -n "$remove" ]; then
     remove_installed_mainline_kernels
