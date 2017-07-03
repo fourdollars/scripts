@@ -139,6 +139,11 @@ if [ -n "$update" ]; then
     exit
 fi
 
+if ! which dialog > /dev/null 2>&1; then
+    echo "Please install dialog by \`sudo apt install dialog\` first."
+    exit
+fi
+
 if [ -n "$remove" ]; then
     remove_installed_mainline_kernels
     exit
