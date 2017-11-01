@@ -116,6 +116,11 @@ setup_func()
     export DEBFULLNAME DEBEMAIL
 }
 
+if ! which dpkg-buildpackage > /dev/null 2>&1; then
+    echo "Please install dpkg-dev by \`sudo apt install dpkg-dev\` first."
+    exit
+fi
+
 while :; do
     case "$1" in
         ('-c'|'--config')
