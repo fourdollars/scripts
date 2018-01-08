@@ -20,21 +20,25 @@ url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
 script="$0"
 
 set -e
-eval set -- $(getopt -o "hlruf:t:" -l "help,list,remove,update,from:,to:" -- $@)
+eval set -- $(getopt -o "dhlruf:t:" -l "download-only,help,list,remove,update,from:,to:" -- $@)
 
 while :; do
     case "$1" in
         ('-h'|'--help')
             cat <<ENDLINE
 Usage $0:
-    -h|--help       The manual of this script
-    -f|--from NUM   Lower bound of kernel version
-    -t|--to   NUM   Upper bound of kernel version
-    -l|--list       List available kernel versions
-    -r|--remove     Remove mainline kernels
-    -u|--update     Update the script itself
+    -h|--help          The manual of this script
+    -d|--download-only Download only and not install
+    -f|--from NUM      Lower bound of kernel version
+    -t|--to   NUM      Upper bound of kernel version
+    -l|--list          List available kernel versions
+    -r|--remove        Remove mainline kernels
+    -u|--update        Update the script itself
 ENDLINE
             exit;;
+        ('-d'|'--download-only')
+            download_only="yes"
+            shift;;
         ('-l'|'--list')
             list="yes"
             shift;;
@@ -69,7 +73,9 @@ download_and_install_kernels ()
         for pkg in $pkgs; do
             [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v${ver/~rc/-rc}/$pkg" -O "$PWD/mainline/v$ver/$pkg"
         done
-        sudo dpkg -i $PWD/mainline/v$ver/*.deb
+        if [ -z "$download_only" ]; then
+            sudo dpkg -i $PWD/mainline/v$ver/*.deb
+        fi
     done
 }
 
@@ -163,7 +169,13 @@ if [ -z "$downloads" ]; then
     fi
 fi
 
-if ! dialog --title 'Would you like to install these kernels...' --yesno "$(echo $downloads | xargs -n1)" 0 0; then
+if [ -z "$download_only" ]; then
+    action="install"
+else
+    action="download"
+fi
+
+if ! dialog --title "Would you like to $action these kernels..." --yesno "$(echo $downloads | xargs -n1)" 0 0; then
     exit
 fi
 
