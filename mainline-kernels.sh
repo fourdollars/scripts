@@ -71,7 +71,7 @@ download_and_install_kernels ()
         pkgs=`wget -q $url/v${ver/~rc/-rc}/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v -e lowlatency -e cloud | sort -u`
         mkdir -p "$PWD/mainline/v$ver"
         for pkg in $pkgs; do
-            [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv "$url/v${ver/~rc/-rc}/$pkg" -O "$PWD/mainline/v$ver/$pkg"
+            [ -f "$PWD/mainline/v$ver/$pkg" ] || wget -nv --show-progress "$url/v${ver/~rc/-rc}/$pkg" -O "$PWD/mainline/v$ver/$pkg"
         done
         if [ -z "$download_only" ]; then
             sudo dpkg -i $PWD/mainline/v$ver/*.deb
