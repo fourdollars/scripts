@@ -122,6 +122,11 @@ remove_installed_mainline_kernels ()
             installed="$installed $i"
         fi
     done
+    for i in $(dpkg-query -W | grep linux-image-unsigned-[2-9] | cut -d '-' -f 4-5); do
+        if [ $(echo $i | cut -d '-' -f 2 | wc -c) -gt 6 ]; then
+            installed="$installed $i"
+        fi
+    done
     if [ -z "$installed" ]; then
         echo "There is no mainline kernel to remove."
         exit
