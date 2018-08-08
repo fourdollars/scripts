@@ -10,7 +10,9 @@ fi
 mokutil --sb-state | grep enabled > /dev/null 2>&1 || exit
 
 # Check if there is any additional kernel module
-ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko >/dev/null 2>&1 && exit
+if [ -z "$(ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko)" ]; then
+    exit
+fi
 
 NAME="$(dmidecode -s system-product-name)"
 
