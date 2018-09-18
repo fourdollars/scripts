@@ -10,7 +10,7 @@ fi
 mokutil --sb-state | grep enabled > /dev/null 2>&1 || exit
 
 # Check if there is any additional kernel module
-if [ -z "$(ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko)" ]; then
+if [ -z "$(ls /lib/modules/$(uname -r)/misc/vbox*.ko /lib/modules/$(uname -r)/updates/dkms/*.ko 2>/dev/null)" ]; then
     exit
 fi
 
