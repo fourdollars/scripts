@@ -2,7 +2,7 @@
 
 for pkg in openssh-server tmux; do
     if ! dpkg-query -s $pkg >/dev/null 2>&1; then
-        sudo apt install $pkg
+        sudo apt install --yes $pkg
     fi
 done
 
@@ -16,7 +16,11 @@ ENDFILE
 fi
 . ~/.bashrc
 
-subdomain="$(shuf -n2 /usr/share/dict/american-english | tr -d [:punct:] | tr [:upper:] [:lower:] | xargs echo -n | tr -d  [:space:])"
+subdomain="$(echo $* | xargs echo -n | tr -d [:punct:] | tr -d  [:space:] | tr [:upper:] [:lower:])"
+
+if [ -z "$subdomain" ]; then
+    subdomain="$(shuf -n2 /usr/share/dict/american-english | tr -d [:punct:] | tr [:upper:] [:lower:] | xargs echo -n | tr -d  [:space:])"
+fi
 
 echo -e "Please execute \`\e[42mssh -J serveo.net $(whoami)@$subdomain\e[49m\` from remote to access this machine."
 
