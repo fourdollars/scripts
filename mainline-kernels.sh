@@ -111,7 +111,7 @@ select_kernels_to_install ()
     else
         items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
     fi
-    downloads=$(dialog --clear --checklist 'Select kernels to install...' 0 0 $num $items 2>&1 >/dev/tty)
+    downloads=$(whiptail --clear --checklist 'Select kernels to install...' 0 0 $num $items 2>&1 >/dev/tty)
 }
 
 remove_installed_mainline_kernels ()
@@ -136,7 +136,7 @@ remove_installed_mainline_kernels ()
     installed=$(echo $installed | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
 
     packages=""
-    for i in $(dialog --clear --checklist 'Select kernels to remove...' 0 0 $num $installed 2>&1 >/dev/tty); do
+    for i in $(whiptail --clear --checklist 'Select kernels to remove...' 0 0 $num $installed 2>&1 >/dev/tty); do
         packages="$packages $(dpkg-query -W | eval grep linux.*$i | awk '{print $1}')"
     done
 
@@ -147,11 +147,6 @@ remove_installed_mainline_kernels ()
 
 if [ -n "$update" ]; then
     wget https://raw.githubusercontent.com/fourdollars/scripts/master/mainline-kernels.sh -O $script
-    exit
-fi
-
-if ! which dialog > /dev/null 2>&1; then
-    echo "Please install dialog by \`sudo apt install dialog\` first."
     exit
 fi
 
@@ -180,7 +175,7 @@ else
     action="download"
 fi
 
-if ! dialog --title "Would you like to $action these kernels..." --yesno "$(echo $downloads | xargs -n1)" 0 0; then
+if ! whiptail --title "Would you like to $action these kernels..." --yesno "$(echo $downloads | xargs -n1)" 0 0; then
     exit
 fi
 
