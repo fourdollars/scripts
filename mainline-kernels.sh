@@ -88,7 +88,7 @@ download_and_install_kernels ()
 
 check_available_kernels ()
 {
-    vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
+    vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*' | sort -V`
 
     for ver in $vers; do
         ver="${ver/~rc/-rc}"
