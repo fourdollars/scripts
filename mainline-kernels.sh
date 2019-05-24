@@ -69,13 +69,16 @@ download_and_install_kernels ()
     fi
     for ver in $(eval echo $downloads); do
         ver="${ver/~rc/-rc}"
+        debver="${ver/-rc/~rc}"
         pkgs=`wget -q $url/v$ver/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v -e lowlatency -e cloud | sort -u`
-        mkdir -p "$PWD/kernels/v$ver"
         for pkg in $pkgs; do
-            [ -f "$PWD/kernels/v$ver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$pkg" -O "$PWD/kernels/v$ver/$pkg"
+            [ -d "$PWD/kernels/v$debver" ] || mkdir -p "$PWD/kernels/v$debver"
+            [ -f "$PWD/kernels/v$debver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$pkg" -O "$PWD/kernels/v$debver/$pkg"
         done
-        if [ -z "$download_only" ]; then
-            sudo dpkg -i $PWD/kernels/v$ver/*.deb
+        if [ -z "$pkgs" ]; then
+            echo "There is no v${debver} mainline kernel to download."
+        elif [ -z "$download_only" ]; then
+            sudo dpkg -i $PWD/kernels/v$debver/*.deb
         fi
     done
 }
@@ -85,7 +88,8 @@ check_available_kernels ()
     vers=`wget -q $url -O - | grep -o 'href="v[^"]*"' | grep -o '[0-9][^/]*'`
 
     for ver in $vers; do
-        debver=`echo $ver | sed 's/-rc/~rc/'`
+        ver="${ver/~rc/-rc}"
+        debver="${ver/-rc/~rc}"
         if [ -n "$min" -a -n "$max" ]; then
             if dpkg --compare-versions $debver ge $min && dpkg --compare-versions $debver le $max; then
                 downloads="$downloads $ver"
