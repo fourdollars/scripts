@@ -26,7 +26,10 @@ while :; do
     case "$1" in
         ('-h'|'--help')
             cat <<ENDLINE
-Usage $0:
+Usage:
+    $0 [options] [versions] ...
+
+Options:
     -h|--help          The manual of this script
     -d|--download-only Download only and not install
     -f|--from NUM      Lower bound of kernel version
