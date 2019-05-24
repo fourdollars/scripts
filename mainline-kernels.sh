@@ -68,10 +68,11 @@ download_and_install_kernels ()
         arch='i386'
     fi
     for ver in $(eval echo $downloads); do
-        pkgs=`wget -q $url/v${ver/~rc/-rc}/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v -e lowlatency -e cloud | sort -u`
+        ver="${ver/~rc/-rc}"
+        pkgs=`wget -q $url/v$ver/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v -e lowlatency -e cloud | sort -u`
         mkdir -p "$PWD/kernels/v$ver"
         for pkg in $pkgs; do
-            [ -f "$PWD/kernels/v$ver/$pkg" ] || wget -nv --show-progress "$url/v${ver/~rc/-rc}/$pkg" -O "$PWD/kernels/v$ver/$pkg"
+            [ -f "$PWD/kernels/v$ver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$pkg" -O "$PWD/kernels/v$ver/$pkg"
         done
         if [ -z "$download_only" ]; then
             sudo dpkg -i $PWD/kernels/v$ver/*.deb
