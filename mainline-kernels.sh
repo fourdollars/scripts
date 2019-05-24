@@ -95,18 +95,18 @@ check_available_kernels ()
         debver="${ver/-rc/~rc}"
         if [ -n "$min" -a -n "$max" ]; then
             if dpkg --compare-versions $debver ge $min && dpkg --compare-versions $debver le $max; then
-                downloads="$downloads $ver"
+                downloads="$downloads $debver"
             fi
         elif [ -n "$min" ]; then
             if dpkg --compare-versions $debver ge $min; then
-                downloads="$downloads $ver"
+                downloads="$downloads $debver"
             fi
         elif [ -n "$max" ]; then
             if dpkg --compare-versions $debver le $max; then
-                downloads="$downloads $ver"
+                downloads="$downloads $debver"
             fi
         else
-            downloads="$downloads $ver"
+            downloads="$downloads $debver"
         fi
     done
 }
@@ -119,7 +119,7 @@ select_kernels_to_install ()
     else
         items=$(echo $downloads | xargs -n1 | awk '{ print $1, "kernel", "off" }' | xargs echo)
     fi
-    downloads=$(whiptail --clear --checklist 'Select kernels to install...' 0 0 $num $items 2>&1 >/dev/tty)
+    downloads=$(whiptail --clear --checklist "Select kernels to $action..." 0 0 $num $items 2>&1 >/dev/tty)
 }
 
 remove_installed_mainline_kernels ()
@@ -164,7 +164,14 @@ if [ -n "$remove" ]; then
 fi
 
 if [ -n "$*" ]; then
+    noprompt=1
     downloads="$*"
+fi
+
+if [ -z "$download_only" ]; then
+    action="install"
+else
+    action="download"
 fi
 
 if [ -z "$downloads" ]; then
@@ -177,13 +184,7 @@ if [ -z "$downloads" ]; then
     fi
 fi
 
-if [ -z "$download_only" ]; then
-    action="install"
-else
-    action="download"
-fi
-
-if ! whiptail --title "Would you like to $action these kernels..." --yesno "$(echo $downloads | xargs -n1)" 0 0; then
+if [ -z "$noprompt" ] && [ -n "$downloads" ] && ! whiptail --title "Would you like to $action these kernels?" --yesno "$(echo $downloads | xargs -n1)" 0 0; then
     exit
 fi
 
