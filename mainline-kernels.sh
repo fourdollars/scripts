@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-url='http://kernel.ubuntu.com/~kernel-ppa/mainline'
+url='https://kernel.ubuntu.com/~kernel-ppa/mainline'
 script="$0"
 
 set -e
