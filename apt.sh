@@ -4,7 +4,7 @@ export LANG=C
 
 (stdbuf -oL sudo apt update --yes -o APT::Status-Fd=2 && stdbuf -oL sudo apt full-upgrade --yes -o APT::Status-Fd=2) 3>&2 2>&1 1>&3 |
     stdbuf -oL awk -F: '{print $1, $3, $4}' |
-    while read sta per msg; do
+    while read -r sta per msg; do
         case "$sta" in
             ('dlstatus')
                 msg="Downloading indexes ...\n$msg"
@@ -14,7 +14,7 @@ export LANG=C
                 ;;
         esac
         echo "# $msg"
-        [[ $per =~ ^100 ]] || echo $per
+        [[ $per =~ ^100 ]] || echo "$per"
     done |
     zenity \
         --title "Simple APT updater" \
