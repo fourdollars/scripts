@@ -20,7 +20,7 @@ call plug#end()
 
 " for mh21/errormarker.vim
 let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
-set makeprg=LANGUAGE=C\ make
+set makeprg=LANGUAGE=C\\ make
 
 " for vim-syntastic/syntastic
 set statusline+=%#warningmsg#
@@ -51,7 +51,7 @@ nmap g= viwy:sts <C-R>"<CR>
 nmap g<Bar> viwy:vsplit<CR>:ts <C-R>"<CR>
 
 " vimgrep for keyword
-nmap g* :exec 'vimgrep /\<'.expand('<cword>').'\>/g **/*.[ch] **/*.[ch]pp **/*.cc **/*.java **/*.p[ly] **/*.rb **/*.vala **/*'<CR>
+nmap g* :exec 'vimgrep /\\<'.expand('<cword>').'\\>/g **/*.[ch] **/*.[ch]pp **/*.cc **/*.java **/*.p[ly] **/*.rb **/*.vala **/*'<CR>
 
 " quickfix
 nmap <C-n> :cn<CR>
@@ -63,10 +63,10 @@ let Tlist_Use_Right_Window = 1
 let Tlist_WinWidth = 50
 
 set laststatus=2
-set statusline=%4*%<\ %1*[%F]
-set statusline+=%4*\ %5*[%{&fileencoding}, " encoding
+set statusline=%4*%<\\ %1*[%F]
+set statusline+=%4*\\ %5*[%{&fileencoding}, " encoding
 set statusline+=%{&fileformat}]%m " file format
-set statusline+=%4*%=\ %6*%y%4*\ %3*%l%4*,\ %3*%c%4*\ \<\ %2*%P%4*\ \>
+set statusline+=%4*%=\\ %6*%y%4*\\ %3*%l%4*,\\ %3*%c%4*\\ \\<\\ %2*%P%4*\\ \\>
 
 function s:indent_folding()
     setlocal foldmethod=indent foldcolumn=4 foldnestmax=3 foldlevel=3
@@ -77,7 +77,7 @@ function s:syntax_folding()
 endfunction
 
 if has("autocmd")
-    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+    autocmd BufReadPost * if line("'\\"") > 1 && line("'\\"") <= line("$") | exe "normal! g\`\\"" | endif
     autocmd FileType c,cpp  call s:syntax_folding()
     autocmd FileType sh,vim call s:indent_folding()
     filetype plugin indent on
