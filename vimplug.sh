@@ -1,12 +1,10 @@
 #!/bin/bash
 
-if [ -f ~/.vim/autoload/plug.vim ]; then
-	exit
+if [ ! -f ~/.vim/autoload/plug.vim ]; then
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-cat >> ~/.vimrc <<ENDLINE
+cat > ~/.vimrc <<ENDLINE
 call plug#begin('~/.vim/plugged')
 Plug 'mh21/errormarker.vim'
 Plug 'sheerun/vim-polyglot'
@@ -34,8 +32,9 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_sh_shellcheck_args = "-x"
 
 " My own preferred settings
-set hls
 set expandtab
+set hlsearch
+set number
 set shiftwidth=4
 set tabstop=4
 
@@ -80,7 +79,7 @@ endfunction
 if has("autocmd")
     autocmd BufReadPost * if line("'\\"") > 1 && line("'\\"") <= line("$") | exe "normal! g\`\\"" | endif
     autocmd FileType c,cpp  call s:syntax_folding()
-    autocmd FileType sh,vim call s:indent_folding()
+    autocmd FileType sh,vim,python call s:indent_folding()
     filetype plugin indent on
 endif
 ENDLINE

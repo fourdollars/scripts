@@ -47,4 +47,4 @@ wget https://bit.ly/vimplug -O - | bash -
 ```
  https://bit.ly/vimplug
 
-> Please make sure there is no ~/.vim/autoload/plug.vim or ~/.vimrc under the home directory.
+> Please backup your own ~/.vimrc before using this script.
