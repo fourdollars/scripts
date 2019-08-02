@@ -12,6 +12,19 @@ if [ ! -f ~/.vim/autoload/plug.vim ]; then
     fi
 fi
 
+if ! command -v shellcheck >/dev/null 2>&1; then
+    echo "Please install shellcheck."
+fi
+
+if ! command -v ctags >/dev/null 2>&1; then
+    echo "Please install ctags."
+fi
+
+if ! command -v git >/dev/null 2>&1; then
+    echo "Please install git."
+    exit 1
+fi
+
 cat > ~/.vimrc <<ENDLINE
 call plug#begin('~/.vim/plugged')
 Plug 'mh21/errormarker.vim'
@@ -47,6 +60,7 @@ set number
 set shiftwidth=4
 set tabstop=4
 
+highlight LineNr ctermfg=grey
 highlight Search ctermfg=white ctermbg=darkyellow
 
 nmap <c-h> :set hls!<BAR>set hls?<CR>
@@ -90,3 +104,7 @@ endif
 ENDLINE
 
 vim +PlugInstall
+
+if command -v stty >/dev/null 2>&1; then
+    stty sane
+fi
