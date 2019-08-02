@@ -14,6 +14,7 @@ Plug 'vim-scripts/OmniCppComplete'
 Plug 'vim-scripts/gtk-vim-syntax'
 Plug 'vim-scripts/taglist.vim'
 Plug 'vim-syntastic/syntastic'
+Plug 'tpope/vim-unimpaired'
 call plug#end()
 
 " for mh21/errormarker.vim
@@ -52,10 +53,6 @@ nmap g<Bar> viwy:vsplit<CR>:ts <C-R>"<CR>
 
 " vimgrep for keyword
 nmap g* :exec 'vimgrep /\\<'.expand('<cword>').'\\>/g **/*.[ch] **/*.[ch]pp **/*.cc **/*.java **/*.p[ly] **/*.rb **/*.vala **/*'<CR>
-
-" quickfix
-nmap <C-n> :cn<CR>
-nmap <C-p> :cp<CR>
 
 " taglist plugin
 nnoremap <silent> <C-t> :TlistToggle<CR>
