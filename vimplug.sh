@@ -1,7 +1,15 @@
 #!/bin/bash
 
 if [ ! -f ~/.vim/autoload/plug.vim ]; then
-    curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    if command -v curl >/dev/null 2>&1; then
+        curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    elif command -v wget >/dev/null 2>&1; then
+        [ ! -d ~/.vim/autoload ] && mkdir -p ~/.vim/autoload
+        wget https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -O ~/.vim/autoload/plug.vim
+    else
+        echo "There is no wget or curl to download https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+        exit 1
+    fi
 fi
 
 cat > ~/.vimrc <<ENDLINE
