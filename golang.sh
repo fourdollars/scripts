@@ -5,7 +5,7 @@
 
 URL="https://golang.org/dl/"
 ARCH=$(dpkg --print-architecture)
-LATEST=$(wget "$URL" -O - 2>/dev/null | grep Archive -B 1 | grep "$ARCH" | head -n1 | sed -ne 's/.*\(http[^"]*\).*/\1/p')
+LATEST=$(wget "$URL" -O - 2>/dev/null | grep Archive -B 1 | grep "linux-$ARCH" | head -n1 | sed -ne 's/.*\(http[^"]*\).*/\1/p')
 FILE=$(basename "$LATEST")
 GOBIN="$HOME/.local/share/go/bin/go"
 
