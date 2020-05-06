@@ -1,33 +1,65 @@
 #!/bin/bash
 # https://help.launchpad.net/API/SigningRequests
+# https://api.launchpad.net/
 
-echo "oauth_consumer_key=${oauth_consumer_key:=test}"
-oauth=$(http --form post https://launchpad.net/+request-token oauth_consumer_key="$oauth_consumer_key" oauth_signature_method=PLAINTEXT oauth_signature="&")
-echo "$oauth"
+oauth_consumer_key=${oauth_consumer_key:=test}
 
-eval "${oauth/&*/}"
-echo "oauth_token=${oauth_token:=}"
+get_token()
+{
+    echo "oauth_consumer_key=${oauth_consumer_key}"
+    oauth=$(http --form post https://launchpad.net/+request-token oauth_consumer_key="$oauth_consumer_key" oauth_signature_method=PLAINTEXT oauth_signature="&")
+    echo "$oauth"
 
-eval "${oauth/*&/}"
-echo "oauth_token_secret=${oauth_token_secret:=}"
+    eval "${oauth/&*/}"
+    echo "oauth_token=${oauth_token:=}"
 
-echo "Please open https://launchpad.net/+authorize-token?oauth_token=$oauth_token to authorize the token."
+    eval "${oauth/*&/}"
+    echo "oauth_token_secret=${oauth_token_secret:=}"
 
-while :; do
-    body=$(http --form post https://launchpad.net/+access-token oauth_token="$oauth_token" oauth_consumer_key="$oauth_consumer_key" oauth_signature_method=PLAINTEXT oauth_signature="&$oauth_token_secret")
-    if [ "$body" = "Request token has not yet been reviewed. Try again later." ]; then
-        echo "Wait for 5 seconds."
-        sleep 5
-    elif [ "$body" = "Invalid OAuth signature." ]; then
-        break
-    else
-        echo "$body"
-        oauth=${body/&lp.context=*/}
-        eval "${oauth/&*/}"
-        echo "oauth_token=${oauth_token}"
+    echo "Please open https://launchpad.net/+authorize-token?oauth_token=$oauth_token to authorize the token."
 
-        eval "${oauth/*&/}"
-        echo "oauth_token_secret=${oauth_token_secret}"
-        break
-    fi
-done
+    while :; do
+        body=$(http --form post https://launchpad.net/+access-token oauth_token="$oauth_token" oauth_consumer_key="$oauth_consumer_key" oauth_signature_method=PLAINTEXT oauth_signature="&$oauth_token_secret")
+        if [ "$body" = "Request token has not yet been reviewed. Try again later." ]; then
+            echo "Wait for 5 seconds."
+            sleep 5
+        elif [ "$body" = "Invalid OAuth signature." ]; then
+            break
+        else
+            echo "$body"
+            oauth=${body/&lp.context=*/}
+            eval "${oauth/&*/}"
+            echo "oauth_token=${oauth_token}"
+
+            eval "${oauth/*&/}"
+            echo "oauth_token_secret=${oauth_token_secret}"
+            break
+        fi
+    done
+}
+
+if [ -f "$HOME/.config/launchpad/${oauth_consumer_key}" ]; then
+    source "$HOME/.config/launchpad/${oauth_consumer_key}"
+else
+    get_token
+    mkdir -p "$HOME/.config/launchpad"
+    cat > "$HOME/.config/launchpad/${oauth_consumer_key}" <<ENDLINE
+#!/bin/bash
+
+export oauth_token="${oauth_token}"
+export oauth_token_secret="${oauth_token_secret}"
+ENDLINE
+fi
+
+if [ -n "$1" ]; then
+    api="$1" && shift
+    http -v GET "https://api.launchpad.net/$api" \
+        "OAuth realm"=="https://api.launchpad.net/" \
+        oauth_consumer_key=="${oauth_consumer_key}" \
+        oauth_nonce=="$(date +%s)" \
+        oauth_signature=="&${oauth_token_secret}" \
+        oauth_signature_method=="PLAINTEXT" \
+        oauth_timestamp=="$(date +%s)" \
+        oauth_token=="${oauth_token}" \
+        oauth_version=="1.0"
+fi
