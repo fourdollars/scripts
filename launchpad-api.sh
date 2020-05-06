@@ -38,6 +38,36 @@ get_token()
     done
 }
 
+get_api()
+{
+    api="$1" && shift
+    http --follow GET "https://api.launchpad.net/$api" \
+        'OAuth realm'=="https://api.launchpad.net/" \
+        oauth_consumer_key=="${oauth_consumer_key}" \
+        oauth_nonce=="$(date +%s)" \
+        oauth_signature=="&${oauth_token_secret}" \
+        oauth_signature_method=="PLAINTEXT" \
+        oauth_timestamp=="$(date +%s)" \
+        oauth_token=="${oauth_token}" \
+        oauth_version=="1.0" \
+        "$@"
+}
+
+post_api()
+{
+    api="$1" && shift
+    http --form POST "https://api.launchpad.net/$api" \
+        'OAuth realm'="https://api.launchpad.net/" \
+        oauth_consumer_key="${oauth_consumer_key}" \
+        oauth_nonce="$(date +%s)" \
+        oauth_signature="&${oauth_token_secret}" \
+        oauth_signature_method="PLAINTEXT" \
+        oauth_timestamp="$(date +%s)" \
+        oauth_token="${oauth_token}" \
+        oauth_version="1.0" \
+        "$@"
+}
+
 if [ -f "$HOME/.config/launchpad/${oauth_consumer_key}" ]; then
     source "$HOME/.config/launchpad/${oauth_consumer_key}"
 else
@@ -51,15 +81,16 @@ export oauth_token_secret="${oauth_token_secret}"
 ENDLINE
 fi
 
-if [ -n "$1" ]; then
-    api="$1" && shift
-    http -v GET "https://api.launchpad.net/$api" \
-        "OAuth realm"=="https://api.launchpad.net/" \
-        oauth_consumer_key=="${oauth_consumer_key}" \
-        oauth_nonce=="$(date +%s)" \
-        oauth_signature=="&${oauth_token_secret}" \
-        oauth_signature_method=="PLAINTEXT" \
-        oauth_timestamp=="$(date +%s)" \
-        oauth_token=="${oauth_token}" \
-        oauth_version=="1.0"
-fi
+case "$1" in
+    ("get"|"GET")
+        shift
+        get_api "$@"
+        ;;
+    ("post"|"POST")
+        shift
+        post_api "$@"
+        ;;
+    (*)
+        get_api devel/people/+me
+        ;;
+esac
