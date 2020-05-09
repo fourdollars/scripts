@@ -21,6 +21,7 @@ get_token()
     while :; do
         body=$(http --form post https://launchpad.net/+access-token oauth_token="$oauth_token" oauth_consumer_key="$oauth_consumer_key" oauth_signature_method=PLAINTEXT oauth_signature="&$oauth_token_secret")
         if [ "$body" = "Request token has not yet been reviewed. Try again later." ]; then
+            # Timed out after 900 seconds.
             echo "Wait for 5 seconds."
             sleep 5
         elif [ "$body" = "Invalid OAuth signature." ]; then
