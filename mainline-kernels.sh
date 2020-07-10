@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 # -*- coding: utf-8; indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 #
-# Copyright (C) 2015 Shih-Yuan Lee (FourDollars) <fourdollars@gmail.com>
+# Copyright (C) 2020 Shih-Yuan Lee (FourDollars) <fourdollars@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,18 +65,14 @@ done
 
 download_and_install_kernels ()
 {
-    if [ "$(uname -m)" = 'x86_64' ]; then
-        arch='amd64'
-    else
-        arch='i386'
-    fi
+    arch=$(dpkg --print-architecture)
     for ver in $(eval echo $downloads); do
         ver="${ver/~rc/-rc}"
         debver="${ver/-rc/~rc}"
         pkgs=`wget -q $url/v$ver/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v -e lowlatency -e cloud | sort -u`
         for pkg in $pkgs; do
             [ -d "$PWD/kernels/v$debver" ] || mkdir -p "$PWD/kernels/v$debver"
-            [ -f "$PWD/kernels/v$debver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$pkg" -O "$PWD/kernels/v$debver/$pkg"
+            [ -f "$PWD/kernels/v$debver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$pkg" -O "$PWD/kernels/v$debver/$pkg" || wget -nv --show-progress "$url/v$ver/$arch/$pkg" -O "$PWD/kernels/v$debver/$pkg"
         done
         if [ -z "$pkgs" ]; then
             echo "There is no v${debver} mainline kernel to download."
