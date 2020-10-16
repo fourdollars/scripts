@@ -52,8 +52,8 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_sh_shellcheck_args = "-x"
-let g:syntastic_python_checkers = ['pep8']
-let g:syntastic_python_pep8_args = "--ignore=E501,W503"
+let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_python_flake8_args = "--ignore=E501,W503"
 
 " My own preferred settings
 set expandtab
