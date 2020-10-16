@@ -20,6 +20,10 @@ if ! command -v ctags >/dev/null 2>&1; then
     echo "Please install ctags."
 fi
 
+if ! command -v flake8 >/dev/null 2>&1; then
+    echo "Please install flake8."
+fi
+
 if ! command -v git >/dev/null 2>&1; then
     echo "Please install git."
     exit 1
