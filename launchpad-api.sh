@@ -3,6 +3,7 @@
 # https://api.launchpad.net/
 
 oauth_consumer_key=${oauth_consumer_key:=test}
+LAUNCHPAD_API="${LAUNCHPAD_API:=https://api.launchpad.net/}"
 
 get_token()
 {
@@ -39,11 +40,39 @@ get_token()
     done
 }
 
+parse_api()
+{
+    if [ -z "$1" ]; then
+        return
+    fi
+    case "$1" in
+        (${LAUNCHPAD_API}*)
+            echo "$1"
+            ;;
+        (devel/*)
+            echo "${LAUNCHPAD_API}$1"
+            ;;
+        (/devel/*)
+            echo "${LAUNCHPAD_API}${1:1}"
+            ;;
+        (/*)
+            echo "${LAUNCHPAD_API}devel$1"
+            ;;
+        (*)
+            echo "${LAUNCHPAD_API}devel/$1"
+            ;;
+    esac
+}
+
 get_api()
 {
-    api="$1" && shift
-    http --follow GET "https://api.launchpad.net/$api" \
-        'OAuth realm'=="https://api.launchpad.net/" \
+    api=$(parse_api "$1")
+    if [ -z "$api" ]; then
+        return
+    fi
+    shift
+    http --check-status --ignore-stdin --follow GET "$api" \
+        'OAuth realm'=="${LAUNCHPAD_API}" \
         oauth_consumer_key=="${oauth_consumer_key}" \
         oauth_nonce=="$(date +%s)" \
         oauth_signature=="&${oauth_token_secret}" \
@@ -56,9 +85,13 @@ get_api()
 
 post_api()
 {
-    api="$1" && shift
-    http --form POST "https://api.launchpad.net/$api" \
-        'OAuth realm'="https://api.launchpad.net/" \
+    api=$(parse_api "$1")
+    if [ -z "$api" ]; then
+        return
+    fi
+    shift
+    http --check-status --ignore-stdin --form POST "$api" \
+        'OAuth realm'="${LAUNCHPAD_API}/" \
         oauth_consumer_key="${oauth_consumer_key}" \
         oauth_nonce="$(date +%s)" \
         oauth_signature="&${oauth_token_secret}" \
@@ -70,6 +103,7 @@ post_api()
 }
 
 if [ -f "$HOME/.config/launchpad/${oauth_consumer_key}" ]; then
+    # shellcheck source=/dev/null
     source "$HOME/.config/launchpad/${oauth_consumer_key}"
 else
     get_token
@@ -83,6 +117,9 @@ ENDLINE
 fi
 
 case "$1" in
+    ('')
+        get_api devel/people/+me
+        ;;
     ("get"|"GET")
         shift
         get_api "$@"
@@ -92,6 +129,6 @@ case "$1" in
         post_api "$@"
         ;;
     (*)
-        get_api devel/people/+me
+        echo "usage: $0 [get|post] API_URL [param1==value1|field1=value1]... # Check the REQUEST_ITEM part in the httpie manual for details."
         ;;
 esac

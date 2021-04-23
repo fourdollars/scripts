@@ -27,6 +27,18 @@ Options:
 
 > Usage: ./mkfreedos.sh [device node, such as /dev/sdb] [Label Name]
 
+## launchpad-api.sh
+
+ A script to access [Launchpad API](https://api.launchpad.net/).
+
+> Usage: ./launchpad-api.sh [get|post] API_URL [param1==value1|field1=value1]... # Check the REQUEST_ITEM part in the httpie manual for details.
+
+```
+./launchpad-api.sh get people/+me        # Get your own information.
+./launchpad-api.sh get bugs/1            # Get the info of bug 1.
+./launchpad-api.sh get bugs/1/bug_tasks  # Get the tasks of bug 1.
+```
+
 ## serveo.sh
 
  A quick script to set up a SSH reverse tunnel on Debian/Ubuntu.
