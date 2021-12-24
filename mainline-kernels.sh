@@ -72,8 +72,8 @@ download_and_install_kernels ()
         pkgs=`wget -q $url/v$ver/ -O - | grep -o "linux[^\"]*\(all\|$arch\).deb" | grep -v -e lowlatency -e cloud | sort -u`
         for pkg in $pkgs; do
             [ -d "$PWD/kernels/v$debver" ] || mkdir -p "$PWD/kernels/v$debver"
-            [ -s "$PWD/kernels/v$debver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$arch/$pkg" -O "$PWD/kernels/v$debver/$pkg"
-            [ -s "$PWD/kernels/v$debver/$pkg" ] || wget -nv --show-progress "$url/v$ver/$pkg" -O "$PWD/kernels/v$debver/$pkg"
+            [ -s "$PWD/kernels/v$debver/$pkg" ] || (wget -nv --show-progress --continue "$url/v$ver/$arch/$pkg" -O "$PWD/kernels/v$debver/$pkg.download" && mv "$PWD/kernels/v$debver/$pkg.download" "$PWD/kernels/v$debver/$pkg")
+            [ -s "$PWD/kernels/v$debver/$pkg" ] || (wget -nv --show-progress --continue "$url/v$ver/$pkg" -O "$PWD/kernels/v$debver/$pkg" && mv "$PWD/kernels/v$debver/$pkg.download" "$PWD/kernels/v$debver/$pkg")
         done
         if [ -z "$pkgs" ]; then
             echo "There is no v${debver} mainline kernel to download."
