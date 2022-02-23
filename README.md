@@ -39,17 +39,6 @@ Options:
 ./launchpad-api.sh get bugs/1/bug_tasks  # Get the tasks of bug 1.
 ```
 
-## serveo.sh
-
- A quick script to set up a SSH reverse tunnel on Debian/Ubuntu.
-```
-$ wget https://bit.ly/sshportal -O - | bash - # random subdomain name
-$ wget https://bit.ly/sshportal -O - | bash /dev/stdin thanos snap fingers # specify the subdomain name
-```
-
-> Use https://serveo.net/ to set up a SSH reverse tunnel behind the firewall.
-> I wrote [an article](https://medium.com/@fourdollars/how-to-setup-a-temporary-ssh-reverse-tunnel-behind-the-firewall-by-serveo-net-on-debian-ubuntu-4c128bb64387) to explain it.
-
 ## vimplug.sh
 
  A quick script to setup the vim environment.
