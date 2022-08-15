@@ -37,7 +37,7 @@ while [ ! -f "/tmp/$FILE" ] || [ "$(sha256sum "/tmp/$FILE" | awk '{print $1}')" 
     wget -q "https://golang.org$LATEST" -O "/tmp/$FILE"
 done
 
-cd ~/.local/share || exit
+mkdir -p ~/.local/share && cd ~/.local/share || exit
 rm -fr go
 tar xf "/tmp/$FILE"
 rm -f "/tmp/$FILE"
