@@ -31,15 +31,18 @@ fi
 
 cat > ~/.vimrc <<ENDLINE
 call plug#begin('~/.vim/plugged')
+Plug 'arrufat/vala.vim'
+Plug 'chazmcgarvey/vim-mermaid'
+Plug 'dense-analysis/ale'
 Plug 'mh21/errormarker.vim'
 Plug 'sheerun/vim-polyglot'
+Plug 'tpope/vim-unimpaired'
+Plug 'vim-airline/vim-airline'
 Plug 'vim-scripts/DoxygenToolkit.vim'
 Plug 'vim-scripts/EnhCommentify.vim'
 Plug 'vim-scripts/OmniCppComplete'
 Plug 'vim-scripts/gtk-vim-syntax'
 Plug 'vim-scripts/taglist.vim'
-Plug 'vim-syntastic/syntastic'
-Plug 'tpope/vim-unimpaired'
 call plug#end()
 
 " for mh21/errormarker.vim
@@ -58,6 +61,7 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_sh_shellcheck_args = "-x"
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_python_flake8_args = "--ignore=E501,W503,E203"
+call ale#Set('python_flake8_options', '--ignore=E501,W503,E203')
 
 " My own preferred settings
 set expandtab
