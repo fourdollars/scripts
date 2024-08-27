@@ -61,7 +61,17 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_sh_shellcheck_args = "-x"
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_python_flake8_args = "--ignore=E501,W503,E203"
+
+" for dense-analysis/ale
 call ale#Set('python_flake8_options', '--ignore=E501,W503,E203')
+
+" for vim-airline/vim-airline
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
+endif
+let g:airline_symbols.colnr = '@'
+let g:airline_symbols.linenr = '('
+let g:airline_symbols.maxlinenr = ')'
 
 " My own preferred settings
 set expandtab
