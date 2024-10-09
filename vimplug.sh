@@ -84,6 +84,13 @@ set tabstop=4
 highlight LineNr ctermfg=grey
 highlight Search ctermfg=white ctermbg=darkyellow
 
+" codeium plugin
+let g:codeium_disable_bindings = 1
+imap <script><silent><nowait><expr> <Tab> codeium#Accept()
+imap \\n   <Cmd>call codeium#CycleCompletions(1)<CR>
+imap \\p   <Cmd>call codeium#CycleCompletions(-1)<CR>
+imap \\q   <Cmd>call codeium#Clear()<CR>
+
 nmap <c-h> :set hls!<BAR>set hls?<CR>
 nmap <c-l> :set list!<BAR>set list?<CR>
 nmap <c-u> :set nu!<BAR>set nu?<CR>
