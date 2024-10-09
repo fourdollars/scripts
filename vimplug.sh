@@ -31,6 +31,7 @@ fi
 
 cat > ~/.vimrc <<ENDLINE
 call plug#begin('~/.vim/plugged')
+Plug 'Exafunction/codeium.vim'
 Plug 'arrufat/vala.vim'
 Plug 'chazmcgarvey/vim-mermaid'
 Plug 'dense-analysis/ale'
