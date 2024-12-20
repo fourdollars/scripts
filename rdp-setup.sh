@@ -18,7 +18,7 @@ lock-after=false
 [1]
 item-type=0
 display-name=GNOME Remote Desktop RDP credentials
-secret={'username': <'username'>, 'password': <'password'>}
+secret={'username': <'u'>, 'password': <'p'>}
 mtime=$STAMP
 ctime=$STAMP
 
@@ -33,7 +33,7 @@ gsettings set org.gnome.desktop.remote-desktop.rdp view-only false
 mkdir -p "$HOME"/.local/share/gnome-remote-desktop/certificates/
 rm -fr "$HOME"/.local/share/gnome-remote-desktop/certificates/*
 openssl genrsa -out "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.key 4096
-openssl req -subj "/C=TW/ST=TP/L=Taipei/O=Headless/CN=sylee.org" -new -x509 -days 365 -key "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.key -out "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.crt
+openssl req -subj "/CN=https:\/\/bit.ly\/rdp-setup" -new -x509 -days 365 -key "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.key -out "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.crt
 gsettings set org.gnome.desktop.remote-desktop.rdp tls-key "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.key
 gsettings set org.gnome.desktop.remote-desktop.rdp tls-cert "$HOME"/.local/share/gnome-remote-desktop/certificates/rdp-tls.crt
 systemctl --user enable gnome-remote-desktop.service
