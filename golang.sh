@@ -3,7 +3,7 @@
 # Author: Shih-Yuan Lee (FourDollars)
 # Licensed by GPLv3+
 
-URL="https://golang.org/dl/"
+URL="https://go.dev/dl/"
 ARCH=$(dpkg --print-architecture)
 LINE=$(wget "$URL" -O - 2>/dev/null | grep Archive -B 1 | grep "linux-$ARCH" | head -n1)
 LATEST=$(echo "$LINE" | grep -Po '(?<=href=")[^"]*')
