@@ -37,6 +37,7 @@ Plug 'chazmcgarvey/vim-mermaid'
 Plug 'dense-analysis/ale'
 Plug 'mh21/errormarker.vim'
 Plug 'sheerun/vim-polyglot'
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-unimpaired'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-scripts/DoxygenToolkit.vim'
@@ -45,6 +46,12 @@ Plug 'vim-scripts/OmniCppComplete'
 Plug 'vim-scripts/gtk-vim-syntax'
 Plug 'vim-scripts/taglist.vim'
 call plug#end()
+
+" for tpope/vim-commentary
+nmap <c-/> <Plug>CommentaryLine
+vmap <c-/> <Plug>CommentaryLine
+nmap <c-_> <Plug>CommentaryLine
+vmap <c-_> <Plug>CommentaryLine
 
 " for mh21/errormarker.vim
 let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
