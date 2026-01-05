@@ -93,6 +93,7 @@ highlight Search ctermfg=white ctermbg=darkyellow
 
 " codeium plugin
 let g:codeium_disable_bindings = 1
+let g:codeium_enabled = v:false
 imap <script><silent><nowait><expr> <Tab> codeium#Accept()
 imap \\n   <Cmd>call codeium#CycleCompletions(1)<CR>
 imap \\p   <Cmd>call codeium#CycleCompletions(-1)<CR>
