@@ -47,7 +47,11 @@ fi
 
 # Install AI tools
 if [ -n "$(command -v brew)" ]; then
-    brew install ollama
+    if [ -z "$(command -v ollama)" ]; then
+        brew install ollama
+    elif [ "$(command -v ollama)" = "/home/linuxbrew/.linuxbrew/bin/ollama" ]; then
+        brew upgrade ollama
+    fi
 fi
 
 # Install Agent Skills
@@ -65,4 +69,13 @@ if [ -d ~/skills/lp-api ]; then
 else
     git clone https://github.com/fourdollars/lp-api.git ~/skills/lp-api
 fi
-ln -snf ~/skills/lp-api/launchpad ~/.claude/skills/launchpad
+if [ -d ~/skills/lp-api/launchpad ]; then
+    ln -snf ~/skills/lp-api/launchpad ~/.claude/skills/launchpad
+    if [ -n "$(command -v gemini)" ]; then
+        if gemini extension list | grep launchpad; then
+            cd ~/skills/lp-api/launchpad && gemini extensions uninstall launchpad && yes y | gemini extensions install . && cd -
+        else
+            cd ~/skills/lp-api/launchpad && yes y | gemini extensions install . && cd -
+        fi
+    fi
+fi
