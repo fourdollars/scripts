@@ -64,6 +64,15 @@ else
 fi
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.claude/skills/skill-creator
 
+if [ -d ~/skills/planning-with-files ]; then
+    cd ~/skills/planning-with-files && git pull
+else
+    git clone https://github.com/OthmanAdi/planning-with-files ~/skills/planning-with-files
+fi
+if [ -d ~/skills/planning-with-files/planning-with-files ]; then
+    ln -snf ~/skills/planning-with-files/planning-with-files ~/.copilot/skills/planning-with-files
+fi
+
 if [ -d ~/skills/lp-api ]; then
     cd ~/skills/lp-api && git pull
 else
