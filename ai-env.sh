@@ -58,7 +58,7 @@ fi
 mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/skills
 
 if [ -d ~/skills/anthropics-skills ]; then
-    cd ~/skills/anthropics-skills && git pull
+    cd ~/skills/anthropics-skills && git config pull.rebase true && git pull
 else
     git clone https://github.com/anthropics/skills.git ~/skills/anthropics-skills
 fi
@@ -74,7 +74,7 @@ if [ -d ~/skills/planning-with-files/planning-with-files ]; then
 fi
 
 if [ -d ~/skills/lp-api ]; then
-    cd ~/skills/lp-api && git pull
+    cd ~/skills/lp-api && git config pull.rebase true && git pull
 else
     git clone https://github.com/fourdollars/lp-api.git ~/skills/lp-api
 fi
