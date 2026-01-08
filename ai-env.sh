@@ -70,7 +70,7 @@ else
     git clone https://github.com/OthmanAdi/planning-with-files ~/skills/planning-with-files
 fi
 if [ -d ~/skills/planning-with-files/planning-with-files ]; then
-    ln -snf ~/skills/planning-with-files/planning-with-files ~/.copilot/skills/planning-with-files
+    ln -snf ~/skills/planning-with-files/planning-with-files ~/.claude/skills/planning-with-files
 fi
 
 if [ -d ~/skills/lp-api ]; then
@@ -88,3 +88,4 @@ if [ -d ~/skills/lp-api/launchpad ]; then
         fi
     fi
 fi
+ls -l ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/skills
