@@ -55,7 +55,7 @@ if [ -n "$(command -v brew)" ]; then
 fi
 
 # Install Agent Skills
-mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/skills
+mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/skills
 
 if [ -d ~/skills/anthropics-skills ]; then
     cd ~/skills/anthropics-skills && git config pull.rebase true && git pull
@@ -63,6 +63,7 @@ else
     git clone https://github.com/anthropics/skills.git ~/skills/anthropics-skills
 fi
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.claude/skills/skill-creator
+ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.gemini/skills/skill-creator
 
 if [ -d ~/skills/planning-with-files ]; then
     cd ~/skills/planning-with-files && git pull
@@ -71,6 +72,7 @@ else
 fi
 if [ -d ~/skills/planning-with-files/planning-with-files ]; then
     ln -snf ~/skills/planning-with-files/planning-with-files ~/.claude/skills/planning-with-files
+    ln -snf ~/skills/planning-with-files/planning-with-files ~/.gemini/skills/planning-with-files
 fi
 
 if [ -d ~/skills/lp-api ]; then
@@ -80,6 +82,7 @@ else
 fi
 if [ -d ~/skills/lp-api/launchpad ]; then
     ln -snf ~/skills/lp-api/launchpad ~/.claude/skills/launchpad
+    ln -snf ~/skills/lp-api/launchpad ~/.gemini/skills/launchpad
     if [ -n "$(command -v gemini)" ]; then
         if gemini extension list | grep launchpad; then
             cd ~/skills/lp-api/launchpad && gemini extensions uninstall launchpad && yes y | gemini extensions install . && cd -
@@ -88,4 +91,4 @@ if [ -d ~/skills/lp-api/launchpad ]; then
         fi
     fi
 fi
-ls -l ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/skills
+ls -l ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/skills
