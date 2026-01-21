@@ -2,14 +2,49 @@
 # Strict bash mode
 set -euo pipefail
 
+# Ensure curl or wget is available
+if [ -z "$(command -v curl)" ] && [ -z "$(command -v wget)" ]; then
+    echo "Neither curl nor wget found. Attempting to install curl..."
+    if [ -n "$(command -v apt-get)" ]; then
+        sudo apt-get update && sudo apt-get install -y curl
+    elif [ -n "$(command -v dnf)" ]; then
+        sudo dnf install -y curl
+    elif [ -n "$(command -v yum)" ]; then
+        sudo yum install -y curl
+    elif [ -n "$(command -v pacman)" ]; then
+        sudo pacman -Sy --noconfirm curl
+    else
+        echo "Error: Cannot install curl. Please install curl or wget manually."
+        exit 1
+    fi
+fi
+
+# Helper function to download with curl or wget
+download() {
+    local url="$1"
+    if [ -n "$(command -v curl)" ]; then
+        curl -fsSL "$url"
+    elif [ -n "$(command -v wget)" ]; then
+        wget -qO- "$url"
+    else
+        echo "Error: Neither curl nor wget available"
+        return 1
+    fi
+}
+
 # bun is a fast, modern JavaScript runtime, compiler, and package manager - https://bun.sh
 if [ -z "$(command -v bun)" ]; then
     # Install bun (It will append 'export BUN_INSTALL="$HOME/.bun"; export PATH="$BUN_INSTALL/bin:$PATH"' to $HOME/.bashrc)
-    curl -fsSL https://bun.sh/install | bash
+    download https://bun.sh/install | bash
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
 else
     bun upgrade
+fi
+
+# Create node symlink to bun (required for copilot and other npm-based tools)
+if [ ! -e "$HOME/.bun/bin/node" ]; then
+    ln -sf "$HOME/.bun/bin/bun" "$HOME/.bun/bin/node"
 fi
 
 # Install AI tools
@@ -18,7 +53,7 @@ bun install -g opencode-ai opencode-lmstudio opencode-skills @github/copilot @go
 # uv is an extremely fast Python package and project manager, written in Rust - https://docs.astral.sh/uv/
 if [ -z "$(command -v uv)" ]; then
     # Install uv (It will append '. "$HOME/.local/bin/env"' to $HOME/.bashrc and $HOME/.profile when PATH doesn't contain ~/.local/bin)
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    download https://astral.sh/uv/install.sh | sh
     if ! grep -q "$HOME"/.local/bin <<<"$PATH"; then
         # shellcheck source=/dev/null
         source "$HOME"/.local/bin/env
@@ -33,7 +68,7 @@ uv tool install specify-cli --force --from git+https://github.com/github/spec-ki
 # Homebrew is a package manager for macOS/Linux - https://brew.sh/
 if [ -z "$(command -v brew)" ]; then
     # Install Homebrew (It will append 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' to $HOME/.bashrc)
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(download https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     if ! grep -q linuxbrew "$HOME"/.bashrc; then
         echo >> "$HOME"/.bashrc
         # shellcheck disable=SC2016
