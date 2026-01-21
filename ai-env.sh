@@ -70,9 +70,9 @@ if [ -d ~/skills/planning-with-files ]; then
 else
     git clone https://github.com/OthmanAdi/planning-with-files ~/skills/planning-with-files
 fi
-if [ -d ~/skills/planning-with-files/planning-with-files ]; then
-    ln -snf ~/skills/planning-with-files/planning-with-files ~/.claude/skills/planning-with-files
-    ln -snf ~/skills/planning-with-files/planning-with-files ~/.gemini/skills/planning-with-files
+if [ -d ~/skills/planning-with-files/skills/planning-with-files ]; then
+    ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.claude/skills/planning-with-files
+    ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.gemini/skills/planning-with-files
 fi
 
 if [ -d ~/skills/lp-api ]; then
