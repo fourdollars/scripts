@@ -87,6 +87,11 @@ if [ -n "$(command -v brew)" ]; then
     elif [ "$(command -v ollama)" = "/home/linuxbrew/.linuxbrew/bin/ollama" ]; then
         brew upgrade ollama
     fi
+    if [ -z "$(command -v claude)" ]; then
+        brew install --cask claude-code
+    elif [ "$(command -v claude)" = "/home/linuxbrew/.linuxbrew/bin/claude" ]; then
+        brew upgrade claude-code
+    fi
 fi
 
 # Install Agent Skills
