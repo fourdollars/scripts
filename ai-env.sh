@@ -43,7 +43,7 @@ else
 fi
 
 # Create node symlink to bun (required for copilot and other npm-based tools)
-if [ ! -e "$HOME/.bun/bin/node" ]; then
+if [ ! -e "$HOME/.bun/bin/node" ] && [ -z "$(command -v node)" ]; then
     ln -sf "$HOME/.bun/bin/bun" "$HOME/.bun/bin/node"
 fi
 
