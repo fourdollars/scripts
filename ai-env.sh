@@ -39,7 +39,7 @@ if [ -z "$(command -v bun)" ]; then
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
 else
-    bun upgrade
+    download https://bun.sh/install | bash
 fi
 
 # Create node symlink to bun (required for copilot and other npm-based tools)
@@ -59,7 +59,7 @@ if [ -z "$(command -v uv)" ]; then
         source "$HOME"/.local/bin/env
     fi
 else
-    uv self update
+    download https://astral.sh/uv/install.sh | sh
 fi
 
 # Install AI tools
