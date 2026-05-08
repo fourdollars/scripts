@@ -97,24 +97,41 @@ fi
 # Install Agent Skills
 mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/skills
 
+## skill-creator
 if [ -d ~/skills/anthropics-skills ]; then
     cd ~/skills/anthropics-skills && git config pull.rebase true && git pull
 else
     git clone https://github.com/anthropics/skills.git ~/skills/anthropics-skills
 fi
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.claude/skills/skill-creator
+ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.copilot/skills/skill-creator
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.gemini/skills/skill-creator
 
+## planning-with-files
 if [ -d ~/skills/planning-with-files ]; then
     cd ~/skills/planning-with-files && git pull
 else
     git clone https://github.com/OthmanAdi/planning-with-files ~/skills/planning-with-files
 fi
 if [ -d ~/skills/planning-with-files/skills/planning-with-files ]; then
-    ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.claude/skills/planning-with-files
-    ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.gemini/skills/planning-with-files
+   ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.claude/skills/planning-with-files
+   ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.copilot/skills/planning-with-files
+   ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.gemini/skills/planning-with-files
 fi
 
+## superpowers
+if [ -d ~/skills/superpowers ]; then
+    cd ~/skills/superpowers && git pull
+else
+    git clone https://github.com/obra/superpowers ~/skills/superpowers
+fi
+if [ -d ~/skills/superpowers/skills/superpowers ]; then
+   ln -snf ~/skills/superpowers/skills/superpowers ~/.claude/skills/superpowers
+   ln -snf ~/skills/superpowers/skills/superpowers ~/.copilot/skills/superpowers
+   ln -snf ~/skills/superpowers/skills/superpowers ~/.gemini/skills/superpowers
+fi
+
+## lp-api
 if [ -d ~/skills/lp-api ]; then
     cd ~/skills/lp-api && git config pull.rebase true && git pull
 else
@@ -122,6 +139,7 @@ else
 fi
 if [ -d ~/skills/lp-api/launchpad ]; then
     ln -snf ~/skills/lp-api/launchpad ~/.claude/skills/launchpad
+    ln -snf ~/skills/lp-api/launchpad ~/.copilot/skills/launchpad
     ln -snf ~/skills/lp-api/launchpad ~/.gemini/skills/launchpad
     if [ -n "$(command -v gemini)" ]; then
         if gemini extension list | grep launchpad; then
