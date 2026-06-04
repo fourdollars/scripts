@@ -65,6 +65,14 @@ fi
 # Install AI tools
 uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
 
+# Install AI tools
+if [ -z "$(command -v agy)" ]; then
+    # Install agy (It will append '. "$HOME/.local/bin/env"' to $HOME/.bashrc and $HOME/.profile when PATH doesn't contain ~/.local/bin)
+    download https://antigravity.google/cli/install.sh | bash
+else
+    agy update
+fi
+
 # Homebrew is a package manager for macOS/Linux - https://brew.sh/
 if [ -z "$(command -v brew)" ]; then
     # Install Homebrew (It will append 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' to $HOME/.bashrc)
@@ -95,7 +103,7 @@ if [ -n "$(command -v brew)" ]; then
 fi
 
 # Install Agent Skills
-mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/skills
+mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/.gemini/antigravity-cli/skills ~/skills
 
 ## skill-creator
 if [ -d ~/skills/anthropics-skills ]; then
@@ -104,20 +112,10 @@ else
     git clone https://github.com/anthropics/skills.git ~/skills/anthropics-skills
 fi
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.claude/skills/skill-creator
+ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.config/opencode/skill/skill-creator
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.copilot/skills/skill-creator
+ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.gemini/antigravity-cli/skills/skill-creator
 ln -snf ~/skills/anthropics-skills/skills/skill-creator ~/.gemini/skills/skill-creator
-
-## planning-with-files
-if [ -d ~/skills/planning-with-files ]; then
-    cd ~/skills/planning-with-files && git pull
-else
-    git clone https://github.com/OthmanAdi/planning-with-files ~/skills/planning-with-files
-fi
-if [ -d ~/skills/planning-with-files/skills/planning-with-files ]; then
-   ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.claude/skills/planning-with-files
-   ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.copilot/skills/planning-with-files
-   ln -snf ~/skills/planning-with-files/skills/planning-with-files ~/.gemini/skills/planning-with-files
-fi
 
 ## superpowers
 if [ -d ~/skills/superpowers ]; then
@@ -125,10 +123,15 @@ if [ -d ~/skills/superpowers ]; then
 else
     git clone https://github.com/obra/superpowers ~/skills/superpowers
 fi
-if [ -d ~/skills/superpowers/skills/superpowers ]; then
-   ln -snf ~/skills/superpowers/skills/superpowers ~/.claude/skills/superpowers
-   ln -snf ~/skills/superpowers/skills/superpowers ~/.copilot/skills/superpowers
-   ln -snf ~/skills/superpowers/skills/superpowers ~/.gemini/skills/superpowers
+if [ -d ~/skills/superpowers/ ]; then
+    find /home/sylee/skills/superpowers/ -name SKILL.md -exec dirname {} \; | while read -r dir; do
+        target="$(basename "$dir")"
+        ln -snf "$dir" ~/.claude/skills/"$target"
+        ln -snf "$dir" ~/.config/opencode/skill/"$target"
+        ln -snf "$dir" ~/.copilot/skills/"$target"
+        ln -snf "$dir" ~/.gemini/antigravity-cli/skills/"$target"
+        ln -snf "$dir" ~/.gemini/skills/"$target"
+    done
 fi
 
 ## lp-api
@@ -139,7 +142,9 @@ else
 fi
 if [ -d ~/skills/lp-api/launchpad ]; then
     ln -snf ~/skills/lp-api/launchpad ~/.claude/skills/launchpad
+    ln -snf ~/skills/lp-api/launchpad ~/.config/opencode/skill/launchpad
     ln -snf ~/skills/lp-api/launchpad ~/.copilot/skills/launchpad
+    ln -snf ~/skills/lp-api/launchpad ~/.gemini/antigravity-cli/skills/launchpad
     ln -snf ~/skills/lp-api/launchpad ~/.gemini/skills/launchpad
     if [ -n "$(command -v gemini)" ]; then
         if gemini extension list | grep launchpad; then
@@ -149,4 +154,4 @@ if [ -d ~/skills/lp-api/launchpad ]; then
         fi
     fi
 fi
-ls -l ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/skills
+ls -l ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/.gemini/antigravity-cli/skills ~/skills
