@@ -90,11 +90,17 @@ fi
 
 # Install AI tools
 if [ -n "$(command -v brew)" ]; then
-    if [ -z "$(command -v ollama)" ]; then
-        brew install ollama
-    elif [ "$(command -v ollama)" = "/home/linuxbrew/.linuxbrew/bin/ollama" ]; then
-        brew upgrade ollama
-    fi
+    case "$(command -v ollama)" in
+        ('')
+            brew install ollama
+            ;;
+        (/home/linuxbrew/.linuxbrew/bin/ollama)
+            brew upgrade ollama
+            ;;
+        (/usr/local/bin/ollama)
+            curl -fsSL https://ollama.com/install.sh | sh
+            ;;
+    esac
     if [ -z "$(command -v claude)" ]; then
         brew install --cask claude-code
     elif [ "$(command -v claude)" = "/home/linuxbrew/.linuxbrew/bin/claude" ]; then
