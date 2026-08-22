@@ -88,6 +88,10 @@ else
     brew update
 fi
 
+if [ -n "$(brew outdated)" ]; then
+    brew upgrade --yes
+fi
+
 # Install AI tools
 if [ -n "$(command -v brew)" ]; then
     case "$(command -v ollama)" in
@@ -130,7 +134,7 @@ else
     git clone https://github.com/obra/superpowers ~/skills/superpowers
 fi
 if [ -d ~/skills/superpowers/ ]; then
-    find /home/sylee/skills/superpowers/ -name SKILL.md -exec dirname {} \; | while read -r dir; do
+    find ~/skills/superpowers/ -name SKILL.md -exec dirname {} \; | while read -r dir; do
         target="$(basename "$dir")"
         ln -snf "$dir" ~/.claude/skills/"$target"
         ln -snf "$dir" ~/.config/opencode/skill/"$target"
