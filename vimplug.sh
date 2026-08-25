@@ -31,7 +31,6 @@ fi
 
 cat > ~/.vimrc <<ENDLINE
 call plug#begin('~/.vim/plugged')
-Plug 'Exafunction/codeium.vim'
 Plug 'arrufat/vala.vim'
 Plug 'chazmcgarvey/vim-mermaid'
 Plug 'dense-analysis/ale'
@@ -91,14 +90,6 @@ set tabstop=4
 highlight LineNr ctermfg=grey
 highlight Search ctermfg=white ctermbg=darkyellow
 
-" codeium plugin
-let g:codeium_disable_bindings = 1
-let g:codeium_enabled = v:false
-imap <script><silent><nowait><expr> <Tab> codeium#Accept()
-imap \\n   <Cmd>call codeium#CycleCompletions(1)<CR>
-imap \\p   <Cmd>call codeium#CycleCompletions(-1)<CR>
-imap \\q   <Cmd>call codeium#Clear()<CR>
-
 nmap <c-h> :set hls!<BAR>set hls?<CR>
 nmap <c-l> :set list!<BAR>set list?<CR>
 nmap <c-u> :set nu!<BAR>set nu?<CR>
@@ -137,6 +128,15 @@ if has("autocmd")
     autocmd FileType sh,vim,python call s:indent_folding()
     filetype plugin indent on
 endif
+
+function! RuneStatuslineLine()
+  return rune#statusline()
+endfunction
+call airline#parts#define_function('rune_status', 'RuneStatuslineLine')
+let g:airline_section_y = airline#section#create(['rune_status'])
+let g:rune_enabled = 0
+let g:rune_prefix_lines = 120
+let g:rune_suffix_lines = 60
 ENDLINE
 
 vim +PlugInstall

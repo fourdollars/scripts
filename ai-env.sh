@@ -110,10 +110,23 @@ if [ -n "$(command -v brew)" ]; then
     elif [ "$(command -v claude)" = "/home/linuxbrew/.linuxbrew/bin/claude" ]; then
         brew upgrade claude-code
     fi
+    if [ -z "$(command -v herdr)" ]; then
+        brew install herdr
+    elif [ "$(command -v herdr)" = "/home/linuxbrew/.linuxbrew/bin/herdr" ]; then
+        brew upgrade herdr
+    fi
 fi
 
 # Install Agent Skills
-mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/.gemini/antigravity-cli/skills ~/skills
+mkdir -p ~/.claude/skills ~/.copilot/skills ~/.config/opencode/skill ~/.gemini/skills ~/.gemini/antigravity-cli/skills ~/skills/herdr
+
+## herdr
+pushd ~/skills/herdr && herdr --skill > SKILL.md && popd
+ln -snf ~/skills/herdr ~/.claude/skills/herdr
+ln -snf ~/skills/herdr ~/.config/opencode/skill/herdr
+ln -snf ~/skills/herdr ~/.copilot/skills/herdr
+ln -snf ~/skills/herdr ~/.gemini/antigravity-cli/skills/herdr
+ln -snf ~/skills/herdr ~/.gemini/skills/herdr
 
 ## skill-creator
 if [ -d ~/skills/anthropics-skills ]; then
