@@ -1,5 +1,40 @@
 # $4's little scripts collection
 
+## ai-env.sh
+
+ A setup script to install, update, and configure AI runtimes, CLI tools, coding agents, and agent skills across multiple environments.
+
+```bash
+$ ./ai-env.sh
+```
+
+### Features
+
+- **AI CLI Tools & Agents:**
+  - **Antigravity:** `agy` CLI
+  - **Bun:** `@fission-ai/openspec`, `@github/copilot`, `@google/gemini-cli`, `opencode-ai`, `opencode-lmstudio`, `opencode-skills`
+  - **Homebrew / Native:** `claude` (Claude Code), `codex`, `herdr`, `ollama`
+  - **uv:** `specify-cli` ([spec-kit](https://github.com/github/spec-kit))
+- **Agent Skills Integration:**
+  - Automatically sets up and symlinks skills for Antigravity CLI (`~/.gemini/antigravity-cli/skills`), Claude Code (`~/.claude/skills`), Gemini CLI (`~/.gemini/skills`), GitHub Copilot (`~/.copilot/skills`), and OpenCode (`~/.config/opencode/skill`).
+  - Included skills: `herdr`, `launchpad` (`lp-api` extension), `skill-creator` (Anthropic), and `superpowers`.
+- **Runtimes & Package Managers:**
+  - [bun](https://bun.sh) (with Node.js compatibility symlink)
+  - [Homebrew](https://brew.sh/)
+  - [uv](https://docs.astral.sh/uv/) (fast Python package manager)
+
+## launchpad-api.sh
+
+ A script to access [Launchpad API](https://api.launchpad.net/).
+
+> Usage: ./launchpad-api.sh [get|post] API_URL [param1==value1|field1=value1]... # Check the REQUEST_ITEM part in the httpie manual for details.
+
+```
+./launchpad-api.sh get people/+me        # Get your own information.
+./launchpad-api.sh get bugs/1            # Get the info of bug 1.
+./launchpad-api.sh get bugs/1/bug_tasks  # Get the tasks of bug 1.
+```
+
 ## mainline-kernels.sh
 
  Install the mainline kernels from https://kernel.ubuntu.com/~kernel-ppa/mainline on Ubuntu.
@@ -26,29 +61,6 @@ Options:
  A quick script to make FreeDOS USB stick on Debian/Ubuntu.
 
 > Usage: ./mkfreedos.sh [device node, such as /dev/sdb] [Label Name]
-
-## launchpad-api.sh
-
- A script to access [Launchpad API](https://api.launchpad.net/).
-
-> Usage: ./launchpad-api.sh [get|post] API_URL [param1==value1|field1=value1]... # Check the REQUEST_ITEM part in the httpie manual for details.
-
-```
-./launchpad-api.sh get people/+me        # Get your own information.
-./launchpad-api.sh get bugs/1            # Get the info of bug 1.
-./launchpad-api.sh get bugs/1/bug_tasks  # Get the tasks of bug 1.
-```
-
-## vimplug.sh
-
- A quick script to setup the vim environment.
-
-```
-wget https://bit.ly/vimplug -O - | bash -
-```
- https://bit.ly/vimplug
-
-> Please backup your own ~/.vimrc before using this script.
 
 ## run-autopkgtest.sh
 
@@ -101,3 +113,14 @@ OPTIONS:
 ```
 
  https://git.io/run-autopkgtest
+
+## vimplug.sh
+
+ A quick script to setup the vim environment.
+
+```
+wget https://bit.ly/vimplug -O - | bash -
+```
+ https://bit.ly/vimplug
+
+> Please backup your own ~/.vimrc before using this script.
