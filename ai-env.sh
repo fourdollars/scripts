@@ -108,7 +108,12 @@ if [ -n "$(command -v brew)" ]; then
     if [ -z "$(command -v claude)" ]; then
         brew install --cask claude-code
     elif [ "$(command -v claude)" = "/home/linuxbrew/.linuxbrew/bin/claude" ]; then
-        brew upgrade claude-code
+        brew upgrade --cask claude-code
+    fi
+    if [ -z "$(command -v codex)" ]; then
+        brew install --cask codex
+    elif [ "$(command -v codex)" = "/home/linuxbrew/.linuxbrew/bin/codex" ]; then
+        brew upgrade --cask codex
     fi
     if [ -z "$(command -v herdr)" ]; then
         brew install herdr
