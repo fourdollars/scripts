@@ -48,7 +48,7 @@ if [ ! -e "$HOME/.bun/bin/node" ] && [ -z "$(command -v node)" ]; then
 fi
 
 # Install AI tools
-bun install -g opencode-ai opencode-lmstudio opencode-skills @github/copilot @google/gemini-cli @fission-ai/openspec
+bun install -g @opencode/cli @github/copilot @google/gemini-cli @fission-ai/openspec
 
 # uv is an extremely fast Python package and project manager, written in Rust - https://docs.astral.sh/uv/
 if [ -z "$(command -v uv)" ]; then

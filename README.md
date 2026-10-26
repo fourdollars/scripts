@@ -12,7 +12,7 @@ $ ./ai-env.sh
 
 - **AI CLI Tools & Agents:**
   - **Antigravity:** `agy` CLI
-  - **Bun:** `@fission-ai/openspec`, `@github/copilot`, `@google/gemini-cli`, `opencode-ai`, `opencode-lmstudio`, `opencode-skills`
+  - **Bun:** `@fission-ai/openspec`, `@github/copilot`, `@google/gemini-cli`, `@opencode/cli`
   - **Homebrew / Native:** `claude` (Claude Code), `codex`, `herdr`, `ollama`
   - **uv:** `specify-cli` ([spec-kit](https://github.com/github/spec-kit))
 - **Agent Skills Integration:**
